@@ -5,11 +5,21 @@ All data shapes are defined here. No module defines its own ad-hoc dicts.
 
 from __future__ import annotations
 
+import re
 from datetime import date, datetime
 from pathlib import Path
 from typing import Optional
 
 from pydantic import BaseModel, Field
+
+
+def slugify(text: str) -> str:
+    """Convert text to a URL-safe slug (lowercase, hyphens, no special chars)."""
+    text = text.lower().strip()
+    text = re.sub(r"[^\w\s-]", "", text)
+    text = re.sub(r"[\s_]+", "-", text)
+    text = re.sub(r"-+", "-", text)
+    return text.strip("-")
 
 
 # ---------------------------------------------------------------------------
@@ -109,6 +119,86 @@ class RankedOutput(BaseModel):
     ranked_at: datetime
     product_count: int
     products: list[RankedProduct]
+
+
+# ---------------------------------------------------------------------------
+# Linked output (after GeniusLink enrichment)
+# ---------------------------------------------------------------------------
+
+class LinkedProduct(BaseModel):
+    rank: int
+    asin: str
+    title: str
+    brand: str
+    model: str
+    full_name: str
+    model_slug: str = ""
+    bsr: Optional[int] = None
+    review_count: Optional[int] = None
+    rating: Optional[float] = None
+    price_usd: Optional[float] = None
+    image_url: Optional[str] = None
+    detail_page_url: Optional[str] = None
+    heat_score: float
+    rank_change: str = "NEW"
+    affiliate_url: str = ""
+
+    def model_post_init(self, __context) -> None:
+        if not self.model_slug:
+            self.model_slug = slugify(f"{self.brand} {self.model}")
+        if not self.affiliate_url and self.detail_page_url:
+            self.affiliate_url = self.detail_page_url
+
+
+# ---------------------------------------------------------------------------
+# Content generation output
+# ---------------------------------------------------------------------------
+
+class ProductContent(BaseModel):
+    rank: int
+    asin: str
+    brand: str
+    model: str
+    full_name: str
+    model_slug: str
+    geniuslink_url: str = ""
+    amazon_url: Optional[str] = None
+    primary_image_url: Optional[str] = None
+    image_alt: str = ""
+    price_usd: Optional[float] = None
+    rating: Optional[float] = None
+    review_count: Optional[int] = None
+    bsr: Optional[int] = None
+    heat_score: float
+    rank_change: str = "NEW"
+    best_for: str = ""
+    why_hot: str
+    short_specs: str
+
+
+class WeeklyRoundup(BaseModel):
+    slug: str
+    category_id: str
+    week_of: str
+    h1_title: str
+    meta_title: str
+    meta_description: str
+    intro: str
+    methodology: str
+    trend_insight: str
+    faqs: str
+    affiliate_disclosure: str = ""
+    products: list[ProductContent]
+
+
+class CatalogEntry(BaseModel):
+    model_slug: str
+    category_id: str
+    brand: str
+    model: str
+    asin: str
+    default_geniuslink_url: str = ""
+    default_image_url: Optional[str] = None
 
 
 # ---------------------------------------------------------------------------

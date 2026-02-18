@@ -20,6 +20,9 @@ from pipeline.models import RunLog, runs_path
 from pipeline.modules.config_loader import ConfigLoaderError, load as load_config
 from pipeline.modules.signals_collector import SignalsCollectorError, collect as collect_signals
 from pipeline.modules.ranker import RankerError, rank as rank_products
+from pipeline.modules.geniuslink_client import GeniusLinkError, enrich as enrich_links
+from pipeline.modules.content_generator import ContentGeneratorError, generate as generate_content
+from pipeline.modules.airtable_client import AirtableClientError, write as write_airtable
 
 logging.basicConfig(
     level=logging.INFO,
@@ -90,7 +93,54 @@ def main(category_id: str, force: bool = False) -> None:
 
     run_log.products_ranked = ranked.product_count
 
-    # --- Pipeline complete (Phase 1 ends here) ---
+    # --- Step 4: Enrich with GeniusLink affiliate URLs ---
+    try:
+        linked, gl_cached, gl_created, gl_failed = enrich_links(
+            ranked, config, week_of, force=force,
+        )
+    except GeniusLinkError as e:
+        logger.error("GeniusLink client failed: %s", e)
+        run_log.status = "failed"
+        run_log.error = f"geniuslink_client: {e}"
+        run_log.run_completed_at = datetime.now(timezone.utc)
+        _save_run_log(run_log, week_of)
+        sys.exit(1)
+
+    run_log.geniuslink_cached = gl_cached
+    run_log.geniuslink_created = gl_created
+    run_log.geniuslink_failed = gl_failed
+    if gl_failed > 0:
+        run_log.warnings.append(
+            f"GeniusLink failed for {gl_failed} product(s) — using raw Amazon URLs"
+        )
+
+    # --- Step 5: Generate content via Claude ---
+    try:
+        roundup = generate_content(linked, config, week_of, force=force)
+    except ContentGeneratorError as e:
+        logger.error("Content generator failed: %s", e)
+        run_log.status = "failed"
+        run_log.error = f"content_generator: {e}"
+        run_log.run_completed_at = datetime.now(timezone.utc)
+        _save_run_log(run_log, week_of)
+        sys.exit(1)
+
+    # --- Step 6: Write to Airtable ---
+    try:
+        write_airtable(roundup, config, linked_products=linked)
+    except AirtableClientError as e:
+        logger.error("Airtable client failed: %s", e)
+        run_log.status = "failed"
+        run_log.error = f"airtable_client: {e}"
+        run_log.run_completed_at = datetime.now(timezone.utc)
+        _save_run_log(run_log, week_of)
+        sys.exit(1)
+
+    run_log.airtable_roundup_written = True
+    run_log.airtable_rankings_written = len(roundup.products)
+    run_log.airtable_catalog_upserted = len(roundup.products)
+
+    # --- Pipeline complete ---
     run_log.status = "success"
     run_log.run_completed_at = datetime.now(timezone.utc)
     _save_run_log(run_log, week_of)
@@ -102,10 +152,12 @@ def main(category_id: str, force: bool = False) -> None:
     print(f"Products found: {signals.products_before_filter}")
     print(f"After filtering: {signals.products_after_filter}")
     print(f"Ranked: {ranked.product_count}")
+    print(f"GeniusLink: {gl_cached} cached, {gl_created} created, {gl_failed} failed")
+    print(f"Airtable: 1 roundup, {len(roundup.products)} rankings, {len(roundup.products)} catalog")
     print(f"{'='*60}")
-    for p in ranked.products:
+    for p in roundup.products:
         print(f"  #{p.rank}  {p.full_name}")
-        print(f"       Heat Score: {p.heat_score}  |  BSR: {p.bsr}  |  Rating: {p.rating}  |  Reviews: {p.review_count}  |  ${p.price_usd}")
+        print(f"       Heat Score: {p.heat_score}  |  ${p.price_usd}  |  {p.rank_change}")
     print(f"{'='*60}\n")
 
 
