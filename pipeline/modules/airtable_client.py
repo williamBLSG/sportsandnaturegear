@@ -170,6 +170,21 @@ def write(
 
         # --- Upsert weekly_rankings ---
         rankings_table = api.table(base_id, config.table_rankings)
+
+        # Delete stale ranking rows for this roundup (handles re-runs where
+        # the product list changed, e.g. after filter updates)
+        new_slugs = {
+            f"{roundup.week_of}-{roundup.category_id}-{p.model_slug}"
+            for p in roundup.products
+        }
+        existing = rankings_table.all(
+            formula=EQUAL(FIELD("roundup_slug"), STR_VALUE(roundup.slug))
+        )
+        stale = [r["id"] for r in existing if r["fields"].get("slug") not in new_slugs]
+        if stale:
+            logger.info("Deleting %d stale ranking rows", len(stale))
+            rankings_table.batch_delete(stale)
+
         ranking_records = []
         for product in roundup.products:
             ranking_records.append({

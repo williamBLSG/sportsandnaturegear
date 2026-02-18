@@ -149,10 +149,37 @@ def _fetch_products(api, config: CategoryConfig) -> list[RawProduct]:
     return all_products
 
 
+def _passes_gender_filter(title: str, gender: str) -> bool:
+    """Check if a product title matches the target gender.
+
+    Rules:
+    - Unisex products (title has both genders, or "Unisex") pass for either gender
+    - "Men's" or "for Men" without any women signal → fails for gender=women
+    - "Women's" or "for Women" without any men signal → fails for gender=men
+    """
+    t = title.lower()
+    has_women = "women" in t or "woman" in t
+    has_men = "men's" in t or "for men" in t or " men " in t or "men," in t
+    # "Unisex" always passes
+    if "unisex" in t:
+        return True
+    # Both genders mentioned → unisex, passes for either
+    if has_women and has_men:
+        return True
+    if gender == "women" and has_men and not has_women:
+        return False
+    if gender == "men" and has_women and not has_men:
+        return False
+    return True
+
+
 def _apply_filters(products: list[RawProduct], config: CategoryConfig) -> list[RawProduct]:
-    """Apply config-based filters: price range, min reviews, min rating."""
+    """Apply config-based filters: price range, min reviews, min rating, gender."""
     filtered = []
     for p in products:
+        if not _passes_gender_filter(p.title, config.gender):
+            logger.debug("Gender filter removed: %s", p.title)
+            continue
         if p.price_usd is not None:
             if p.price_usd < config.price_min_usd or p.price_usd > config.price_max_usd:
                 continue
