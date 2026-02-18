@@ -1,0 +1,20 @@
+category_id: womens-running-shoes
+display_name: "Women's Running Shoes"
+site_name: "Sports & Nature Gear"
+site_url: "https://www.sportsandnaturegear.com"
+gender: women
+product_type: running shoes
+search_index: FashionWomen
+browse_node_id: "679255011"
+keywords: "women's running shoes"
+min_reviews: 50
+min_rating: 3.5
+price_min_usd: 50
+price_max_usd: 250
+slug_prefix: "womens-running-shoes-trending"
+table_roundups: "weekly_roundups"
+table_rankings: "weekly_rankings"
+table_catalog: "catalog"
+assoc_tag: "${AMZ_ASSOC_TAG}"
+geniuslink_group_id: "womens-running-shoes"
+schedule: "every_monday_6am_pt"

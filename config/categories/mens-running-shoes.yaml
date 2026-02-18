@@ -1,0 +1,20 @@
+category_id: mens-running-shoes
+display_name: "Men's Running Shoes"
+site_name: "Sports & Nature Gear"
+site_url: "https://www.sportsandnaturegear.com"
+gender: men
+product_type: running shoes
+search_index: FashionMen
+browse_node_id: "679341011"
+keywords: "men's running shoes"
+min_reviews: 50
+min_rating: 3.5
+price_min_usd: 50
+price_max_usd: 250
+slug_prefix: "mens-running-shoes-trending"
+table_roundups: "weekly_roundups"
+table_rankings: "weekly_rankings"
+table_catalog: "catalog"
+assoc_tag: "${AMZ_ASSOC_TAG}"
+geniuslink_group_id: "mens-running-shoes"
+schedule: "every_monday_6am_pt"
