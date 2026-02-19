@@ -16,7 +16,7 @@ _repo_root = Path(__file__).resolve().parent.parent
 if str(_repo_root) not in sys.path:
     sys.path.insert(0, str(_repo_root))
 
-from pipeline.models import RunLog, runs_path
+from pipeline.models import RunLog, compute_weekly_id, runs_path
 from pipeline.modules.config_loader import ConfigLoaderError, load as load_config
 from pipeline.modules.signals_collector import SignalsCollectorError, collect as collect_signals
 from pipeline.modules.ranker import RankerError, rank as rank_products
@@ -124,6 +124,9 @@ def main(category_id: str, force: bool = False) -> None:
         run_log.run_completed_at = datetime.now(timezone.utc)
         _save_run_log(run_log, week_of)
         sys.exit(1)
+
+    # Set weekly_id on the roundup
+    roundup.weekly_id = compute_weekly_id(week_of)
 
     # --- Step 6: Write to Airtable ---
     try:

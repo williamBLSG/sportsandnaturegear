@@ -22,6 +22,13 @@ def slugify(text: str) -> str:
     return text.strip("-")
 
 
+def compute_weekly_id(week_of: str) -> str:
+    """Convert a week_of date string (e.g. '2026-02-16') to ISO week ID (e.g. '2026-W8')."""
+    dt = datetime.strptime(week_of, "%Y-%m-%d")
+    iso_year, iso_week, _ = dt.isocalendar()
+    return f"{iso_year}-W{iso_week}"
+
+
 # ---------------------------------------------------------------------------
 # Shared helper
 # ---------------------------------------------------------------------------
@@ -60,6 +67,7 @@ class CategoryConfig(BaseModel):
     table_roundups: str
     table_rankings: str
     table_catalog: str
+    table_faq: str
     assoc_tag: str
     geniuslink_group_id: str
     schedule: str
@@ -176,17 +184,24 @@ class ProductContent(BaseModel):
     short_specs: str
 
 
+class FaqEntry(BaseModel):
+    question: str
+    answer: str
+
+
 class WeeklyRoundup(BaseModel):
     slug: str
     category_id: str
     week_of: str
+    weekly_id: str = ""
     h1_title: str
     meta_title: str
     meta_description: str
     intro: str
     methodology: str
     trend_insight: str
-    faqs: str
+    hub_summary: str = ""
+    faqs: list[FaqEntry]
     affiliate_disclosure: str = ""
     products: list[ProductContent]
 

@@ -78,7 +78,10 @@ Generate a JSON object with this EXACT structure. Every field listed below is re
   "intro": "...",
   "methodology": "...",
   "trend_insight": "...",
-  "faqs": "...",
+  "hub_summary": "...",
+  "faqs": [
+    {{"question": "...", "answer": "..."}}
+  ],
   "affiliate_disclosure": "...",
   "products": [
     {{
@@ -119,7 +122,9 @@ methodology: 1-2 short paragraphs in <p> tags explaining how products are ranked
 
 trend_insight: 1-2 short paragraphs in <p> tags noting any interesting trends this week (e.g., a brand dominating, price trends, new entries). Use the product data to make observations.
 
-faqs: 3-5 Q&A pairs using <details>/<summary> HTML. Address Amy's pain points: how rankings work, fit/sizing tips for {config.product_type}, beginner suitability, value vs. price. Do NOT make health/biomechanical claims. Do NOT invent specs.
+hub_summary: 1-2 sentence evergreen summary of this week's trends, suitable for a category hub page. Should read well weeks later — avoid "this week" language. Example: "Brooks and ASICS dominate the trending women's running shoes, with comfort-focused models leading buyer ratings."
+
+faqs: A JSON array of 3-5 objects, each with "question" and "answer" string fields. Address Amy's pain points: how rankings work, fit/sizing tips for {config.product_type}, beginner suitability, value vs. price. Answers should be plain text (no HTML). Do NOT make health/biomechanical claims. Do NOT invent specs.
 
 affiliate_disclosure: A short, transparent affiliate disclosure statement in a <p> tag. Example: "<p>We may earn a small commission when you purchase through our links — at no extra cost to you. This helps us keep our rankings updated weekly.</p>"
 

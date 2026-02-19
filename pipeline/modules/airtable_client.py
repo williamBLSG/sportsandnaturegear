@@ -1,20 +1,24 @@
-"""Airtable client — upserts weekly roundup, rankings, and catalog entries.
+"""Airtable client — upserts weekly roundup, rankings, catalog, and FAQ entries.
 
 All Airtable interaction happens in this module. No other module imports
 the Airtable SDK or constructs API requests.
 
 Table schema (as of 2026-02-18):
-- weekly_roundups: slug (PK), category_id, week_of (date), h1_title,
-    meta_title, meta_description, intro, methodology, trend_insight, faqs,
-    affiliate_disclosure, status (select), created_at (auto)
-- weekly_rankings: slug (PK), category_id, week_of (date), rank, rank_change,
-    brand, model, model_slug, full_name, category_tags (multiselect),
-    best_for, why_hot, heat_score, bsr, review_count, rating,
-    price_usd (currency), asin, amazon_url (url), geniuslink_url (url),
-    primary_image_url (url), image_alt, short_specs, roundup_slug
+- weekly_roundups: slug (PK), category_id, week_of (date), weekly_id,
+    h1_title, meta_title, meta_description, intro, methodology,
+    trend_insight, hub_summary, affiliate_disclosure, status (select),
+    created_at (auto)
+- weekly_rankings: slug (PK), category_id, week_of (date), weekly_id,
+    rank, rank_change, brand, model, model_slug, full_name,
+    display_title, display_detail, cta_text,
+    category_tags (multiselect), best_for, why_hot, heat_score, bsr,
+    review_count, rating, price_usd (currency), asin, amazon_url (url),
+    geniuslink_url (url), primary_image_url (url), image_alt,
+    short_specs, roundup_slug
 - catalog: model_slug (PK), category_id, brand, model, asin,
     first_seen (date), last_seen (date), appearances,
     default_geniuslink_url (url), default_image_url (url), evergreen_blurb
+- faq: slug (PK), weekly_id, question, answer, category_id, roundup_slug
 """
 
 from __future__ import annotations
@@ -28,9 +32,11 @@ from pyairtable.formulas import EQUAL, FIELD, STR_VALUE
 
 from pipeline.models import (
     CategoryConfig,
+    FaqEntry,
     LinkedProduct,
     ProductContent,
     WeeklyRoundup,
+    slugify,
 )
 
 logger = logging.getLogger(__name__)
@@ -59,13 +65,14 @@ def _roundup_fields(roundup: WeeklyRoundup) -> dict:
         "slug": roundup.slug,
         "category_id": roundup.category_id,
         "week_of": roundup.week_of,
+        "weekly_id": roundup.weekly_id,
         "h1_title": roundup.h1_title,
         "meta_title": roundup.meta_title,
         "meta_description": roundup.meta_description,
         "intro": roundup.intro,
         "methodology": roundup.methodology,
         "trend_insight": roundup.trend_insight,
-        "faqs": roundup.faqs,
+        "hub_summary": roundup.hub_summary,
         "affiliate_disclosure": roundup.affiliate_disclosure,
     }
 
@@ -76,16 +83,37 @@ def _ranking_fields(
 ) -> dict:
     """Build Airtable fields dict for a weekly ranking row."""
     slug = f"{roundup.week_of}-{roundup.category_id}-{product.model_slug}"
+
+    # Composite fields for list widget display
+    display_title = f"{product.full_name} | #{product.rank} / {product.rank_change}"
+
+    detail_parts = []
+    if product.best_for:
+        detail_parts.append(f"Best for: {product.best_for}")
+    if product.why_hot:
+        detail_parts.append(product.why_hot)
+    if product.short_specs:
+        detail_parts.append(product.short_specs)
+    detail_parts.append(f"Heat Score: {product.heat_score}")
+    if product.price_usd is not None:
+        detail_parts.append(f"Price: ${product.price_usd:.2f}")
+    display_detail = "\n\n".join(detail_parts)
+
+    cta_text = f"Shop {product.brand} {product.model} on Amazon →"
+
     fields: dict = {
         "slug": slug,
         "category_id": roundup.category_id,
         "week_of": roundup.week_of,
+        "weekly_id": roundup.weekly_id,
         "rank": product.rank,
         "rank_change": product.rank_change,
         "brand": product.brand,
         "model": product.model,
         "model_slug": product.model_slug,
         "full_name": product.full_name,
+        "display_title": display_title,
+        "display_detail": display_detail,
         "best_for": product.best_for,
         "why_hot": product.why_hot,
         "heat_score": product.heat_score,
@@ -94,6 +122,7 @@ def _ranking_fields(
         "roundup_slug": roundup.slug,
         "image_alt": product.image_alt,
     }
+    fields["cta_text"] = cta_text
     # Only set numeric fields if they have values (Airtable rejects null for number/currency)
     if product.bsr is not None:
         fields["bsr"] = product.bsr
@@ -134,6 +163,29 @@ def _catalog_fields(
     if image:
         fields["default_image_url"] = image
     return fields
+
+
+def _faq_slug(weekly_id: str, category_id: str, question: str) -> str:
+    """Build a deterministic slug for a FAQ row."""
+    # Use first 50 chars of slugified question to keep it readable but bounded
+    q_slug = slugify(question)[:50].rstrip("-")
+    return f"{weekly_id}-{category_id}-{q_slug}"
+
+
+def _faq_fields(
+    faq: FaqEntry,
+    roundup: WeeklyRoundup,
+    config: CategoryConfig,
+) -> dict:
+    """Build Airtable fields dict for a FAQ row."""
+    return {
+        "slug": _faq_slug(roundup.weekly_id, config.category_id, faq.question),
+        "weekly_id": roundup.weekly_id,
+        "question": faq.question,
+        "answer": faq.answer,
+        "category_id": config.category_id,
+        "roundup_slug": roundup.slug,
+    }
 
 
 def write(
@@ -214,6 +266,39 @@ def write(
             replace=True,
         )
 
+        # --- Upsert FAQ entries ---
+        faq_table = api.table(base_id, config.table_faq)
+
+        # Delete stale FAQ rows for this roundup
+        new_faq_slugs = {
+            _faq_slug(roundup.weekly_id, config.category_id, faq.question)
+            for faq in roundup.faqs
+        }
+        existing_faqs = faq_table.all(
+            formula=EQUAL(FIELD("roundup_slug"), STR_VALUE(roundup.slug))
+        )
+        stale_faqs = [
+            r["id"] for r in existing_faqs
+            if r["fields"].get("slug") not in new_faq_slugs
+        ]
+        if stale_faqs:
+            logger.info("Deleting %d stale FAQ rows", len(stale_faqs))
+            faq_table.batch_delete(stale_faqs)
+
+        faq_records = []
+        for faq in roundup.faqs:
+            faq_records.append({
+                "fields": _faq_fields(faq, roundup, config),
+            })
+
+        if faq_records:
+            logger.info("Upserting %d FAQ entries", len(faq_records))
+            faq_table.batch_upsert(
+                faq_records,
+                key_fields=["slug"],
+                replace=True,
+            )
+
     except AirtableClientError:
         raise
     except Exception as e:
@@ -257,3 +342,14 @@ def _validate_row_counts(
         f"Expected {len(roundup.products)} ranking rows for "
         f"roundup_slug '{roundup.slug}', found {len(rankings_rows)}"
     )
+
+    # Check FAQ rows
+    if roundup.faqs:
+        faq_table = api.table(base_id, config.table_faq)
+        faq_rows = faq_table.all(
+            formula=EQUAL(FIELD("roundup_slug"), STR_VALUE(roundup.slug))
+        )
+        assert len(faq_rows) == len(roundup.faqs), (
+            f"Expected {len(roundup.faqs)} FAQ rows for "
+            f"roundup_slug '{roundup.slug}', found {len(faq_rows)}"
+        )
