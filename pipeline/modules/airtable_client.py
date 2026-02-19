@@ -25,6 +25,7 @@ from __future__ import annotations
 
 import logging
 import os
+import re
 from datetime import date
 
 from pyairtable import Api
@@ -85,18 +86,33 @@ def _ranking_fields(
     slug = f"{roundup.week_of}-{roundup.category_id}-{product.model_slug}"
 
     # Composite fields for list widget display
-    display_title = f"{product.full_name} | #{product.rank} / {product.rank_change}"
+    display_title = f"#{product.rank} / {product.rank_change} | {product.full_name}"
+
+    def _strip_html(text: str) -> str:
+        # Replace block-level closing tags with double newlines for paragraph breaks
+        text = re.sub(r"</(?:p|div)>", "\n\n", text)
+        text = re.sub(r"</(?:li|ul|ol)>", "\n", text)
+        # Strip remaining tags
+        text = re.sub(r"<[^>]+>", "", text)
+        # Collapse 3+ newlines to 2, then strip
+        text = re.sub(r"\n{3,}", "\n\n", text)
+        return text.strip()
 
     detail_parts = []
     if product.best_for:
-        detail_parts.append(f"Best for: {product.best_for}")
+        detail_parts.append(f"Best for: {_strip_html(product.best_for)}")
     if product.why_hot:
-        detail_parts.append(product.why_hot)
-    if product.short_specs:
-        detail_parts.append(product.short_specs)
-    detail_parts.append(f"Heat Score: {product.heat_score}")
+        detail_parts.append(_strip_html(product.why_hot))
+    # Structured stats list
+    stats = []
+    stats.append(f"Heat Score: {product.heat_score}")
+    is_new = product.rank_change == "NEW"
+    stats.append(f"New this Week: {'Yes' if is_new else 'No'}")
+    if product.bsr is not None:
+        stats.append(f"ABSR: #{product.bsr:,}")
     if product.price_usd is not None:
-        detail_parts.append(f"Price: ${product.price_usd:.2f}")
+        stats.append(f"Price: ${product.price_usd:.2f}")
+    detail_parts.append("\n".join(stats))
     display_detail = "\n\n".join(detail_parts)
 
     cta_text = f"Shop {product.brand} {product.model} on Amazon →"
