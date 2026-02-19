@@ -62,12 +62,20 @@ def _get_api() -> tuple[Api, str]:
 
 def _roundup_fields(roundup: WeeklyRoundup) -> dict:
     """Build Airtable fields dict for a weekly roundup row."""
-    return {
+    # Hub page fields — computed from roundup data
+    top_product = roundup.products[0] if roundup.products else None
+    image_url = (top_product.primary_image_url or "") if top_product else ""
+    hub_title = f"{roundup.h1_title} — Week of {roundup.week_of}"
+    button_cta = f"See the Top 5 for {roundup.week_of} →"
+
+    fields: dict = {
         "slug": roundup.slug,
         "category_id": roundup.category_id,
         "week_of": roundup.week_of,
         "weekly_id": roundup.weekly_id,
         "h1_title": roundup.h1_title,
+        "hub_title": hub_title,
+        "button_cta": button_cta,
         "meta_title": roundup.meta_title,
         "meta_description": roundup.meta_description,
         "intro": roundup.intro,
@@ -76,6 +84,9 @@ def _roundup_fields(roundup: WeeklyRoundup) -> dict:
         "hub_summary": roundup.hub_summary,
         "affiliate_disclosure": roundup.affiliate_disclosure,
     }
+    if image_url:
+        fields["image_url"] = image_url
+    return fields
 
 
 def _ranking_fields(
