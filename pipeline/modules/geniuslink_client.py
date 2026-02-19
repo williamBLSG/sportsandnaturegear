@@ -12,8 +12,11 @@ from pipeline.models import (
     CategoryConfig,
     LinkedProduct,
     RankedOutput,
+    StateActivityConfig,
+    StateActivityProduct,
     runs_path,
     slugify,
+    state_runs_path,
 )
 
 logger = logging.getLogger(__name__)
@@ -225,3 +228,134 @@ def enrich(
     )
 
     return linked, cached_count, created_count, failed_count
+
+
+# ---------------------------------------------------------------------------
+# State activity product enrichment
+# ---------------------------------------------------------------------------
+
+def _set_state_utm_tags(
+    code: str,
+    state: str,
+    activity: str,
+    product_slug: str,
+    api_key: str,
+    api_secret: str,
+) -> None:
+    """Attach state-activity-specific UTM tags to a geni.us short URL."""
+    state_slug = slugify(state)
+    try:
+        resp = requests.post(
+            f"{GENIUSLINK_BASE}/v2/postprocessingrules",
+            headers=_auth_headers(api_key, api_secret),
+            json={
+                "postProcessingLevel": "link",
+                "shortCodes": [code],
+                "parameterKeyValues": {
+                    "utm_source": "sportsandnaturegear.com",
+                    "utm_medium": "states",
+                    "utm_campaign": state_slug,
+                    "utm_term": activity,
+                    "utm_content": product_slug,
+                },
+            },
+            timeout=15,
+        )
+        resp.raise_for_status()
+    except requests.RequestException as e:
+        logger.warning("Failed to set state UTM tags for %s: %s", code, e)
+
+
+def enrich_state_products(
+    products: list[StateActivityProduct],
+    state: str,
+    config: StateActivityConfig,
+    force: bool = False,
+) -> tuple[list[StateActivityProduct], int, int, int]:
+    """Enrich state activity products with GeniusLink affiliate URLs.
+
+    Idempotent: skips work if products_linked.json exists (unless force=True).
+    Returns (products, cached_count, created_count, failed_count).
+    """
+    artifact_path = state_runs_path(
+        state, config.activity_id, "products_linked.json",
+    )
+
+    if artifact_path.exists() and not force:
+        logger.info("Resuming from cached products_linked.json")
+        data = json.loads(artifact_path.read_text())
+        enriched = [StateActivityProduct(**p) for p in data]
+        return enriched, len(enriched), 0, 0
+
+    api_key = os.environ.get("GENIUSLINK_API_KEY")
+    api_secret = os.environ.get("GENIUSLINK_API_SECRET")
+
+    if not api_key or not api_secret:
+        raise GeniusLinkError(
+            "GENIUSLINK_API_KEY and GENIUSLINK_API_SECRET must be set"
+        )
+
+    group_id = _resolve_group_id(
+        config.geniuslink_group_id, api_key, api_secret,
+    )
+    logger.info(
+        "Resolved GeniusLink group '%s' -> ID %d",
+        config.geniuslink_group_id, group_id,
+    )
+
+    # Load per-activity cache
+    cache_path = state_runs_path(
+        state, config.activity_id, "geniuslink_cache.json",
+    )
+    cache: dict[str, str] = {}
+    if cache_path.exists():
+        cache = json.loads(cache_path.read_text())
+
+    cached_count = 0
+    created_count = 0
+    failed_count = 0
+
+    for product in products:
+        # Check cache by ASIN
+        cached_url = cache.get(product.asin)
+        if cached_url:
+            product.affiliate_link = cached_url
+            cached_count += 1
+            continue
+
+        # Need to create a link from the raw Amazon URL
+        amazon_url = product.affiliate_link  # set to detail_page_url during copy gen
+        if not amazon_url or not amazon_url.startswith("http"):
+            failed_count += 1
+            continue
+
+        result = _create_link(amazon_url, group_id, api_key, api_secret)
+        if result:
+            affiliate_url, code = result
+            product.affiliate_link = affiliate_url
+            cache[product.asin] = affiliate_url
+            created_count += 1
+            # Product slug for UTM: strip the slug prefix to get short name
+            product_name_slug = slugify(product.title)
+            _set_state_utm_tags(
+                code, state, config.activity_id,
+                product_name_slug, api_key, api_secret,
+            )
+        else:
+            # Keep raw Amazon URL as fallback
+            failed_count += 1
+
+    # Save cache
+    cache_path.write_text(json.dumps(cache, indent=2))
+
+    # Save artifact
+    artifact_path.write_text(
+        json.dumps([p.model_dump() for p in products], indent=2)
+    )
+
+    logger.info(
+        "State GeniusLink enrichment: %d cached, %d created, %d failed",
+        cached_count, created_count, failed_count,
+    )
+
+    return products, cached_count, created_count, failed_count

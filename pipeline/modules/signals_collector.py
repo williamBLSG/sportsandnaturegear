@@ -121,9 +121,8 @@ def _fetch_products(api, config: CategoryConfig) -> list[RawProduct]:
     for page in range(1, 3):  # Pages 1 and 2
         logger.info("Fetching page %d for '%s'", page, config.keywords)
         try:
-            result = api.search_items(
+            search_kwargs = dict(
                 keywords=config.keywords,
-                browse_node_id=config.browse_node_id,
                 search_index=config.search_index,
                 item_count=10,
                 item_page=page,
@@ -131,6 +130,9 @@ def _fetch_products(api, config: CategoryConfig) -> list[RawProduct]:
                 sort_by=SortBy.FEATURED,
                 resources=resources,
             )
+            if config.browse_node_id:
+                search_kwargs["browse_node_id"] = config.browse_node_id
+            result = api.search_items(**search_kwargs)
         except Exception as e:
             raise SignalsCollectorError(
                 f"Amazon API call failed (page {page}): {e}"

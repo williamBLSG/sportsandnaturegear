@@ -36,6 +36,9 @@ from pipeline.models import (
     FaqEntry,
     LinkedProduct,
     ProductContent,
+    StateActivityConfig,
+    StateActivityProduct,
+    StateArticle,
     WeeklyRoundup,
     slugify,
 )
@@ -380,3 +383,147 @@ def _validate_row_counts(
             f"Expected {len(roundup.faqs)} FAQ rows for "
             f"roundup_slug '{roundup.slug}', found {len(faq_rows)}"
         )
+
+
+# ---------------------------------------------------------------------------
+# State activity writes
+# ---------------------------------------------------------------------------
+
+def _state_article_fields(article: StateArticle) -> dict:
+    """Build Airtable fields dict for a state_activities row."""
+    fields: dict = {
+        "slug": article.slug,
+        "activity": article.activity,
+        "state_filter": article.state_filter,
+        "parent_page_description": article.parent_page_description,
+        "parent_page_cta": article.parent_page_cta,
+        "meta_title": article.meta_title,
+        "meta_description": article.meta_description,
+        "h1": article.h1,
+        "intro": article.intro,
+        "product1": article.product1,
+        "product2": article.product2,
+        "status": article.status,
+    }
+    # Only include h2/body pairs that have content
+    for i in range(1, 9):
+        h2 = getattr(article, f"h2_{i}")
+        body = getattr(article, f"h2_{i}_body")
+        if h2:
+            fields[f"h2_{i}"] = h2
+            fields[f"h2_{i}_body"] = body
+    return fields
+
+
+def _state_product_fields(product: StateActivityProduct) -> dict:
+    """Build Airtable fields dict for a state_activity_products row."""
+    fields: dict = {
+        "slug": product.slug,
+        "state": product.state,
+        "activity": product.activity,
+        "title": product.title,
+        "description": product.description,
+        "link_text": product.link_text,
+        "asin": product.asin,
+        "product_group": product.product_group,
+        "status": product.status,
+    }
+    if product.image_url:
+        fields["image_url"] = product.image_url
+    if product.image_alt_text:
+        fields["image_alt_text"] = product.image_alt_text
+    if product.affiliate_link:
+        fields["affiliate_link"] = product.affiliate_link
+    if product.bsr is not None:
+        fields["bsr"] = product.bsr
+    return fields
+
+
+def write_state_activity(
+    article: StateArticle,
+    config: StateActivityConfig,
+) -> None:
+    """Upsert one state activity article to Airtable.
+
+    Upsert key: slug. Raises AirtableClientError on failure.
+    """
+    api, base_id = _get_api()
+
+    try:
+        table = api.table(base_id, config.table_activities)
+        record = {"fields": _state_article_fields(article)}
+
+        logger.info("Upserting state activity: %s", article.slug)
+        table.batch_upsert(
+            [record],
+            key_fields=["slug"],
+            replace=True,
+        )
+    except Exception as e:
+        raise AirtableClientError(
+            f"State activity write failed for {article.slug}: {e}"
+        ) from e
+
+    # Validate
+    try:
+        rows = table.all(
+            formula=EQUAL(FIELD("slug"), STR_VALUE(article.slug))
+        )
+        assert len(rows) == 1, (
+            f"Expected 1 row for slug '{article.slug}', found {len(rows)}"
+        )
+    except AssertionError as e:
+        raise AirtableClientError(f"State activity row count validation failed: {e}") from e
+
+    logger.info("State activity written: %s", article.slug)
+
+
+def write_state_activity_products(
+    products: list[StateActivityProduct],
+    config: StateActivityConfig,
+) -> None:
+    """Upsert state activity products to Airtable.
+
+    Upsert key: slug. Raises AirtableClientError on failure or row count mismatch.
+    """
+    if not products:
+        logger.warning("No products to write")
+        return
+
+    api, base_id = _get_api()
+
+    try:
+        table = api.table(base_id, config.table_products)
+        records = [{"fields": _state_product_fields(p)} for p in products]
+
+        logger.info("Upserting %d state activity products", len(records))
+        table.batch_upsert(
+            records,
+            key_fields=["slug"],
+            replace=True,
+        )
+    except Exception as e:
+        raise AirtableClientError(
+            f"State activity products write failed: {e}"
+        ) from e
+
+    # Validate row count for this state+activity
+    activity = products[0].activity
+    state = products[0].state
+    try:
+        rows = table.all(
+            formula=f"AND({{activity}}='{activity}',{{state}}='{state}')"
+        )
+        assert len(rows) >= len(products), (
+            f"Expected at least {len(products)} product rows for "
+            f"{activity} in {state}, found {len(rows)}"
+        )
+    except AssertionError as e:
+        raise AirtableClientError(
+            f"State product row count validation failed: {e}"
+        ) from e
+
+    logger.info(
+        "State activity products written: %d for %s in %s",
+        len(products), activity, state,
+    )

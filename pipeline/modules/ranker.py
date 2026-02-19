@@ -327,12 +327,15 @@ def rank(
     week_of: str,
     trends: TrendsData | None = None,
     force: bool = False,
+    top_n: int = 5,
 ) -> RankedOutput:
     """Normalize, deduplicate, score, and rank products.
 
     When trends data is provided, uses 5-tier priority slotting:
     rising brand+model > top brand+model > rising brand-only > top brand-only > heat score.
     When trends=None, falls back to pure Heat Score ranking (backward compatible).
+
+    top_n controls how many products to select (default 5 for trending, 10 for state activities).
 
     Idempotent: skips work if ranked.json exists (unless force=True).
     """
@@ -383,7 +386,7 @@ def rank(
     else:
         logger.info("No trends data — falling back to Heat Score ranking")
         scored.sort(key=lambda x: x[2], reverse=True)
-        top_5 = [(p, n, h, None, None, 5) for p, n, h in scored[:5]]
+        top_5 = [(p, n, h, None, None, 5) for p, n, h in scored[:top_n]]
 
     ranked_products = []
     for i, (product, norm, heat, tq, match_type, tier) in enumerate(top_5, start=1):

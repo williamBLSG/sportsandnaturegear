@@ -10,11 +10,13 @@ from pathlib import Path
 import yaml
 from pydantic import ValidationError
 
-from pipeline.models import CategoryConfig
+from pipeline.models import CategoryConfig, StateActivityConfig
 
 logger = logging.getLogger(__name__)
 
 _CONFIG_DIR = Path(__file__).resolve().parent.parent.parent / "config" / "categories"
+_STATE_ACTIVITY_DIR = Path(__file__).resolve().parent.parent.parent / "config" / "state-activities"
+_STATE_QUEUE_PATH = Path(__file__).resolve().parent.parent.parent / "config" / "state-queue.yaml"
 _ENV_VAR_PATTERN = re.compile(r"\$\{(\w+)\}")
 
 
@@ -97,3 +99,84 @@ def load(category_id: str) -> CategoryConfig:
 
     logger.info("Config loaded: %s (%s)", config.display_name, config.category_id)
     return config
+
+
+def load_state_activity(activity_id: str) -> StateActivityConfig:
+    """Load and validate a state activity config from YAML.
+
+    Raises ConfigLoaderError on missing file, invalid YAML, missing env vars,
+    or validation failure.
+    """
+    config_path = _STATE_ACTIVITY_DIR / f"{activity_id}.yaml"
+
+    if not config_path.exists():
+        raise ConfigLoaderError(
+            f"State activity config not found: {config_path}"
+        )
+
+    logger.info("Loading state activity config: %s", config_path)
+
+    try:
+        raw_text = config_path.read_text()
+        raw_data = yaml.safe_load(raw_text)
+    except yaml.YAMLError as e:
+        raise ConfigLoaderError(f"Invalid YAML in {config_path}: {e}") from e
+
+    if not isinstance(raw_data, dict):
+        raise ConfigLoaderError(f"Expected a YAML mapping in {config_path}")
+
+    file_activity_id = raw_data.get("activity_id")
+    if file_activity_id != activity_id:
+        raise ConfigLoaderError(
+            f"activity_id in YAML ('{file_activity_id}') does not match "
+            f"filename ('{activity_id}')"
+        )
+
+    try:
+        resolved_data = _walk_and_resolve(raw_data)
+    except ConfigLoaderError:
+        raise
+
+    try:
+        config = StateActivityConfig(**resolved_data)
+    except ValidationError as e:
+        raise ConfigLoaderError(
+            f"State activity config validation failed for '{activity_id}': {e}"
+        ) from e
+
+    logger.info("State activity config loaded: %s (%s)", config.display_name, config.activity_id)
+    return config
+
+
+def load_state_queue() -> tuple[str, list[str]]:
+    """Load the state queue config.
+
+    Returns (start_date_str, states_list).
+    Raises ConfigLoaderError on missing file or invalid structure.
+    """
+    if not _STATE_QUEUE_PATH.exists():
+        raise ConfigLoaderError(
+            f"State queue config not found: {_STATE_QUEUE_PATH}"
+        )
+
+    logger.info("Loading state queue: %s", _STATE_QUEUE_PATH)
+
+    try:
+        raw_text = _STATE_QUEUE_PATH.read_text()
+        raw_data = yaml.safe_load(raw_text)
+    except yaml.YAMLError as e:
+        raise ConfigLoaderError(f"Invalid YAML in {_STATE_QUEUE_PATH}: {e}") from e
+
+    if not isinstance(raw_data, dict):
+        raise ConfigLoaderError(f"Expected a YAML mapping in {_STATE_QUEUE_PATH}")
+
+    start_date = raw_data.get("start_date")
+    if not start_date:
+        raise ConfigLoaderError("state-queue.yaml missing 'start_date'")
+
+    states = raw_data.get("states")
+    if not states or not isinstance(states, list):
+        raise ConfigLoaderError("state-queue.yaml missing or empty 'states' list")
+
+    logger.info("State queue loaded: %d states, start_date=%s", len(states), start_date)
+    return start_date, states
