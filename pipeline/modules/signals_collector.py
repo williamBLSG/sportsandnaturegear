@@ -191,10 +191,75 @@ def _apply_filters(products: list[RawProduct], config: CategoryConfig) -> list[R
     return filtered
 
 
-def collect(config: CategoryConfig, week_of: str, force: bool = False) -> RawSignals:
+def _fetch_supplemental(
+    api,
+    keywords: list[str],
+    config: CategoryConfig,
+    seen_asins: set[str],
+) -> list[RawProduct]:
+    """Make single-page Amazon searches for supplemental keywords (from trends).
+
+    Returns new products not already in the primary results, tagged with source="supplemental".
+    """
+    from amazon_creatorsapi.models import SearchItemsResource, SortBy
+
+    resources = [
+        SearchItemsResource.ITEM_INFO_DOT_TITLE,
+        SearchItemsResource.ITEM_INFO_DOT_BY_LINE_INFO,
+        SearchItemsResource.BROWSE_NODE_INFO_DOT_WEBSITE_SALES_RANK,
+        SearchItemsResource.CUSTOMER_REVIEWS_DOT_COUNT,
+        SearchItemsResource.CUSTOMER_REVIEWS_DOT_STAR_RATING,
+        SearchItemsResource.OFFERS_V2_DOT_LISTINGS_DOT_PRICE,
+        SearchItemsResource.IMAGES_DOT_PRIMARY_DOT_LARGE,
+    ]
+
+    new_products: list[RawProduct] = []
+
+    for kw in keywords:
+        logger.info("Supplemental search: '%s'", kw)
+        try:
+            # Supplemental searches omit browse_node_id — the browse node
+            # constrains too aggressively for targeted brand/model searches and
+            # can return wrong-gender or off-category products instead of the
+            # exact product we're looking for.
+            result = api.search_items(
+                keywords=kw,
+                search_index=config.search_index,
+                item_count=10,
+                item_page=1,
+                min_reviews_rating=int(config.min_rating),
+                sort_by=SortBy.FEATURED,
+                resources=resources,
+            )
+        except Exception as e:
+            logger.warning("Supplemental search failed for '%s': %s", kw, e)
+            continue
+
+        if not result or not result.items:
+            continue
+
+        for item in result.items:
+            product = _extract_product(item)
+            if product and product.asin not in seen_asins:
+                seen_asins.add(product.asin)
+                product.source = "supplemental"
+                new_products.append(product)
+
+    return new_products
+
+
+def collect(
+    config: CategoryConfig,
+    week_of: str,
+    supplemental_keywords: list[str] | None = None,
+    force: bool = False,
+) -> RawSignals:
     """Collect raw product signals from Amazon.
 
     Idempotent: skips API call if raw_signals.json already exists (unless force=True).
+
+    When supplemental_keywords are provided (from trends data), makes additional
+    single-page searches per keyword to find trending products not in primary results.
     """
     artifact_path = runs_path(config.category_id, week_of, "raw_signals.json")
 
@@ -209,11 +274,21 @@ def collect(config: CategoryConfig, week_of: str, force: bool = False) -> RawSig
     if products_before_filter == 0:
         raise SignalsCollectorError("Amazon API returned 0 products — cannot proceed")
 
+    # Supplemental searches from trends data
+    if supplemental_keywords:
+        seen_asins = {p.asin for p in all_products}
+        supplemental = _fetch_supplemental(api, supplemental_keywords, config, seen_asins)
+        logger.info(
+            "Supplemental searches added %d new products from %d keywords",
+            len(supplemental), len(supplemental_keywords),
+        )
+        all_products.extend(supplemental)
+
     filtered = _apply_filters(all_products, config)
 
     if len(filtered) == 0:
         raise SignalsCollectorError(
-            f"All {products_before_filter} products were filtered out — "
+            f"All {len(all_products)} products were filtered out — "
             "check config filters (price range, min_reviews, min_rating)"
         )
 
@@ -223,7 +298,7 @@ def collect(config: CategoryConfig, week_of: str, force: bool = False) -> RawSig
         collected_at=datetime.now(timezone.utc),
         search_keywords=config.keywords,
         total_api_results=products_before_filter,
-        products_before_filter=products_before_filter,
+        products_before_filter=len(all_products),
         products_after_filter=len(filtered),
         products=filtered,
     )
@@ -231,8 +306,10 @@ def collect(config: CategoryConfig, week_of: str, force: bool = False) -> RawSig
     # Save raw data first (before returning)
     artifact_path.write_text(signals.model_dump_json(indent=2))
     logger.info(
-        "Collected %d products (%d after filtering) for %s",
-        products_before_filter, len(filtered), config.category_id,
+        "Collected %d products (%d after filtering, %d supplemental) for %s",
+        len(all_products), len(filtered),
+        len(supplemental_keywords) if supplemental_keywords else 0,
+        config.category_id,
     )
 
     return signals

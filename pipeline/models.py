@@ -71,6 +71,11 @@ class CategoryConfig(BaseModel):
     assoc_tag: str
     geniuslink_group_id: str
     schedule: str
+    # Google Trends config (optional — defaults allow existing configs to load)
+    trends_keyword: Optional[str] = None  # Falls back to `keywords` if absent
+    trends_timeframe: str = "now 7-d"
+    trends_geo: str = "US"
+    trends_max_supplemental_searches: int = 8
 
 
 # ---------------------------------------------------------------------------
@@ -87,6 +92,7 @@ class RawProduct(BaseModel):
     price_usd: Optional[float] = None
     image_url: Optional[str] = None
     detail_page_url: Optional[str] = None
+    source: str = "primary"  # "primary" or "supplemental"
 
 
 class RawSignals(BaseModel):
@@ -98,6 +104,29 @@ class RawSignals(BaseModel):
     products_before_filter: int
     products_after_filter: int
     products: list[RawProduct]
+
+
+# ---------------------------------------------------------------------------
+# Google Trends data
+# ---------------------------------------------------------------------------
+
+class TrendsQuery(BaseModel):
+    query: str                              # Raw query from Google Trends
+    search_interest: int                    # 0-100 relative score
+    increase_percent: Optional[str] = None  # e.g., "20%" or "-10%"
+    source: str                             # "rising" or "top"
+    query_type: str                         # "brand_model", "brand_only", "generic"
+    normalized_brand: Optional[str] = None
+    normalized_model: Optional[str] = None
+
+
+class TrendsData(BaseModel):
+    category_id: str
+    week_of: str
+    collected_at: datetime
+    trends_keyword: str
+    rising_queries: list[TrendsQuery]
+    top_queries: list[TrendsQuery]
 
 
 # ---------------------------------------------------------------------------
@@ -119,6 +148,12 @@ class RankedProduct(BaseModel):
     detail_page_url: Optional[str] = None
     heat_score: float
     rank_change: str = "NEW"
+    # Google Trends ranking fields
+    trend_source: Optional[str] = None         # "rising" or "top"
+    trend_match_type: Optional[str] = None     # "brand_model" or "brand_only"
+    trend_query: Optional[str] = None          # Original Google Trends query
+    trend_search_interest: Optional[int] = None
+    selection_tier: int = 5                    # 1-5
 
 
 class RankedOutput(BaseModel):
@@ -226,6 +261,12 @@ class RunLog(BaseModel):
     run_started_at: datetime
     run_completed_at: Optional[datetime] = None
     status: str = "in_progress"
+    # Trends tracking
+    trends_rising_count: int = 0
+    trends_top_count: int = 0
+    trends_supplemental_searches: int = 0
+    trends_failed: bool = False
+    # Signals tracking
     products_found: int = 0
     products_after_filter: int = 0
     products_ranked: int = 0

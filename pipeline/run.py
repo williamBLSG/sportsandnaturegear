@@ -16,8 +16,9 @@ _repo_root = Path(__file__).resolve().parent.parent
 if str(_repo_root) not in sys.path:
     sys.path.insert(0, str(_repo_root))
 
-from pipeline.models import RunLog, compute_weekly_id, runs_path
+from pipeline.models import CategoryConfig, RunLog, TrendsData, compute_weekly_id, runs_path
 from pipeline.modules.config_loader import ConfigLoaderError, load as load_config
+from pipeline.modules.trends_collector import TrendsCollectorError, collect as collect_trends
 from pipeline.modules.signals_collector import SignalsCollectorError, collect as collect_signals
 from pipeline.modules.ranker import RankerError, rank as rank_products
 from pipeline.modules.geniuslink_client import GeniusLinkError, enrich as enrich_links
@@ -37,6 +38,39 @@ def _compute_week_of() -> str:
     today = date.today()
     monday = today - __import__("datetime").timedelta(days=today.weekday())
     return monday.isoformat()
+
+
+def _build_supplemental_keywords(
+    trends: TrendsData, config: CategoryConfig,
+) -> list[str]:
+    """Build Amazon search keywords from trends data.
+
+    For brand+model queries: "{brand} {model} {gender}'s"
+    For brand-only queries: "{brand} {gender}'s {product_type}"
+    Capped at trends_max_supplemental_searches.
+    """
+    keywords: list[str] = []
+    seen: set[str] = set()
+
+    all_queries = trends.rising_queries + trends.top_queries
+
+    for tq in all_queries:
+        if tq.query_type == "brand_model" and tq.normalized_brand and tq.normalized_model:
+            kw = f"{tq.normalized_brand} {tq.normalized_model} {config.gender}'s"
+        elif tq.query_type == "brand_only" and tq.normalized_brand:
+            kw = f"{tq.normalized_brand} {config.gender}'s {config.product_type}"
+        else:
+            continue
+
+        kw_lower = kw.lower()
+        if kw_lower not in seen:
+            seen.add(kw_lower)
+            keywords.append(kw)
+
+        if len(keywords) >= config.trends_max_supplemental_searches:
+            break
+
+    return keywords
 
 
 def _save_run_log(run_log: RunLog, week_of: str) -> None:
@@ -66,9 +100,25 @@ def main(category_id: str, force: bool = False) -> None:
         _save_run_log(run_log, week_of)
         sys.exit(1)
 
-    # --- Step 2: Collect signals ---
+    # --- Step 2: Collect Google Trends (graceful degradation) ---
+    trends: TrendsData | None = None
     try:
-        signals = collect_signals(config, week_of, force=force)
+        trends = collect_trends(config, week_of, force=force)
+        run_log.trends_rising_count = len(trends.rising_queries)
+        run_log.trends_top_count = len(trends.top_queries)
+    except TrendsCollectorError as e:
+        logger.warning("Trends failed: %s — BSR-only fallback", e)
+        run_log.warnings.append(f"trends_collector: {e}")
+        run_log.trends_failed = True
+
+    # --- Step 3: Collect Amazon signals (with supplemental searches from trends) ---
+    supplemental = _build_supplemental_keywords(trends, config) if trends else None
+    if supplemental:
+        run_log.trends_supplemental_searches = len(supplemental)
+        logger.info("Built %d supplemental keywords from trends", len(supplemental))
+
+    try:
+        signals = collect_signals(config, week_of, supplemental_keywords=supplemental, force=force)
     except SignalsCollectorError as e:
         logger.error("Signals collector failed: %s", e)
         run_log.status = "failed"
@@ -80,9 +130,9 @@ def main(category_id: str, force: bool = False) -> None:
     run_log.products_found = signals.products_before_filter
     run_log.products_after_filter = signals.products_after_filter
 
-    # --- Step 3: Rank products ---
+    # --- Step 4: Rank products (trends-aware) ---
     try:
-        ranked = rank_products(signals, config, week_of, force=force)
+        ranked = rank_products(signals, config, week_of, trends=trends, force=force)
     except RankerError as e:
         logger.error("Ranker failed: %s", e)
         run_log.status = "failed"
@@ -93,7 +143,7 @@ def main(category_id: str, force: bool = False) -> None:
 
     run_log.products_ranked = ranked.product_count
 
-    # --- Step 4: Enrich with GeniusLink affiliate URLs ---
+    # --- Step 5: Enrich with GeniusLink affiliate URLs ---
     try:
         linked, gl_cached, gl_created, gl_failed = enrich_links(
             ranked, config, week_of, force=force,
@@ -114,7 +164,7 @@ def main(category_id: str, force: bool = False) -> None:
             f"GeniusLink failed for {gl_failed} product(s) — using raw Amazon URLs"
         )
 
-    # --- Step 5: Generate content via Claude ---
+    # --- Step 6: Generate content via Claude ---
     try:
         roundup = generate_content(linked, config, week_of, force=force)
     except ContentGeneratorError as e:
@@ -128,7 +178,7 @@ def main(category_id: str, force: bool = False) -> None:
     # Set weekly_id on the roundup
     roundup.weekly_id = compute_weekly_id(week_of)
 
-    # --- Step 6: Write to Airtable ---
+    # --- Step 7: Write to Airtable ---
     try:
         write_airtable(roundup, config, linked_products=linked)
     except AirtableClientError as e:
@@ -152,15 +202,28 @@ def main(category_id: str, force: bool = False) -> None:
     print(f"\n{'='*60}")
     print(f"Pipeline complete: {config.display_name}")
     print(f"Week of: {week_of}")
+    if trends:
+        print(f"Trends: {len(trends.rising_queries)} rising, {len(trends.top_queries)} top queries")
+        print(f"Supplemental searches: {len(supplemental) if supplemental else 0}")
+    else:
+        print("Trends: unavailable (BSR-only fallback)")
     print(f"Products found: {signals.products_before_filter}")
     print(f"After filtering: {signals.products_after_filter}")
     print(f"Ranked: {ranked.product_count}")
     print(f"GeniusLink: {gl_cached} cached, {gl_created} created, {gl_failed} failed")
     print(f"Airtable: 1 roundup, {len(roundup.products)} rankings, {len(roundup.products)} catalog")
     print(f"{'='*60}")
-    for p in roundup.products:
+    tier_labels = {
+        1: "Rising trend (model match)",
+        2: "Top trend (model match)",
+        3: "Rising trend (brand match)",
+        4: "Top trend (brand match)",
+        5: "Heat Score fallback",
+    }
+    for p in ranked.products:
+        reason = tier_labels.get(p.selection_tier, f"Tier {p.selection_tier}")
         print(f"  #{p.rank}  {p.full_name}")
-        print(f"       Heat Score: {p.heat_score}  |  ${p.price_usd}  |  {p.rank_change}")
+        print(f"       {reason}  |  Heat: {p.heat_score}  |  ${p.price_usd}  |  {p.rank_change}")
     print(f"{'='*60}\n")
 
 
