@@ -252,7 +252,7 @@ def _set_state_utm_tags(
                 "postProcessingLevel": "link",
                 "shortCodes": [code],
                 "parameterKeyValues": {
-                    "utm_source": "sportsandnaturegear.com",
+                    "utm_source": "sportsandnaturegear",
                     "utm_medium": "states",
                     "utm_campaign": state_slug,
                     "utm_term": activity,
