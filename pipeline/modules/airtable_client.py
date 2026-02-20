@@ -29,7 +29,7 @@ import re
 from datetime import date
 
 from pyairtable import Api
-from pyairtable.formulas import EQUAL, FIELD, STR_VALUE
+from pyairtable.formulas import match
 
 from pipeline.models import (
     CategoryConfig,
@@ -260,7 +260,7 @@ def write(
             for p in roundup.products
         }
         existing = rankings_table.all(
-            formula=EQUAL(FIELD("roundup_slug"), STR_VALUE(roundup.slug))
+            formula=match({"roundup_slug": roundup.slug})
         )
         stale = [r["id"] for r in existing if r["fields"].get("slug") not in new_slugs]
         if stale:
@@ -305,7 +305,7 @@ def write(
             for faq in roundup.faqs
         }
         existing_faqs = faq_table.all(
-            formula=EQUAL(FIELD("roundup_slug"), STR_VALUE(roundup.slug))
+            formula=match({"roundup_slug": roundup.slug})
         )
         stale_faqs = [
             r["id"] for r in existing_faqs
@@ -356,7 +356,7 @@ def _validate_row_counts(
     # Check roundups
     roundups_table = api.table(base_id, config.table_roundups)
     roundup_rows = roundups_table.all(
-        formula=EQUAL(FIELD("slug"), STR_VALUE(roundup.slug))
+        formula=match({"slug": roundup.slug})
     )
     assert len(roundup_rows) >= 1, (
         f"Expected at least 1 roundup row for slug '{roundup.slug}', "
@@ -366,7 +366,7 @@ def _validate_row_counts(
     # Check rankings for this roundup via roundup_slug (text field, avoids date comparison issues)
     rankings_table = api.table(base_id, config.table_rankings)
     rankings_rows = rankings_table.all(
-        formula=EQUAL(FIELD("roundup_slug"), STR_VALUE(roundup.slug))
+        formula=match({"roundup_slug": roundup.slug})
     )
     assert len(rankings_rows) == len(roundup.products), (
         f"Expected {len(roundup.products)} ranking rows for "
@@ -377,7 +377,7 @@ def _validate_row_counts(
     if roundup.faqs:
         faq_table = api.table(base_id, config.table_faq)
         faq_rows = faq_table.all(
-            formula=EQUAL(FIELD("roundup_slug"), STR_VALUE(roundup.slug))
+            formula=match({"roundup_slug": roundup.slug})
         )
         assert len(faq_rows) == len(roundup.faqs), (
             f"Expected {len(roundup.faqs)} FAQ rows for "
@@ -467,7 +467,7 @@ def write_state_activity(
     # Validate
     try:
         rows = table.all(
-            formula=EQUAL(FIELD("slug"), STR_VALUE(article.slug))
+            formula=match({"slug": article.slug})
         )
         assert len(rows) == 1, (
             f"Expected 1 row for slug '{article.slug}', found {len(rows)}"
