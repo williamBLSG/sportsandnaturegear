@@ -8,7 +8,7 @@ table_products: "state_activity_products"
 geniuslink_group_id: "state-kayaking"
 
 # Amazon product search parameters
-search_index: "SportingGoods"
+search_index: "All"
 keywords: "women's kayaking gear"
 min_reviews: 50
 min_rating: 3.5
