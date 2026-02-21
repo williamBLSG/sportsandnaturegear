@@ -26,6 +26,12 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      - name: Restore GeniusLink cache
+        uses: actions/cache@v4
+        with:
+          path: runs/${{ matrix.category }}/geniuslink_cache.json
+          key: geniuslink-${{ matrix.category }}
+
       - name: Run weekly pipeline
         if: ${{ github.event.inputs.category == '' || github.event.inputs.category == matrix.category }}
         run: python pipeline/run.py --category ${{ matrix.category }}

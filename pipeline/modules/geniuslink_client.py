@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import logging
 import os
+from pathlib import Path
 
 import requests
 
@@ -36,17 +37,24 @@ def _auth_headers(api_key: str, api_secret: str) -> dict:
     }
 
 
-def _load_cache(category_id: str, week_of: str) -> dict[str, str]:
-    """Load ASIN → geni.us URL cache from disk."""
-    cache_path = runs_path(category_id, week_of, "geniuslink_cache.json")
+def _global_cache_path(category_id: str) -> Path:
+    """Return the path to the global (cross-week) ASIN → geni.us cache for a category."""
+    base = Path(__file__).resolve().parent.parent.parent / "runs" / category_id
+    base.mkdir(parents=True, exist_ok=True)
+    return base / "geniuslink_cache.json"
+
+
+def _load_cache(category_id: str) -> dict[str, str]:
+    """Load ASIN → geni.us URL cache from disk (global, not per-week)."""
+    cache_path = _global_cache_path(category_id)
     if cache_path.exists():
         return json.loads(cache_path.read_text())
     return {}
 
 
-def _save_cache(cache: dict[str, str], category_id: str, week_of: str) -> None:
-    """Save ASIN → geni.us URL cache to disk."""
-    cache_path = runs_path(category_id, week_of, "geniuslink_cache.json")
+def _save_cache(cache: dict[str, str], category_id: str) -> None:
+    """Save ASIN → geni.us URL cache to disk (global, not per-week)."""
+    cache_path = _global_cache_path(category_id)
     cache_path.write_text(json.dumps(cache, indent=2))
 
 
@@ -165,7 +173,7 @@ def enrich(
     group_id = _resolve_group_id(config.geniuslink_group_id, api_key, api_secret)
     logger.info("Resolved GeniusLink group '%s' → ID %d", config.geniuslink_group_id, group_id)
 
-    cache = _load_cache(config.category_id, week_of)
+    cache = _load_cache(config.category_id)
     linked: list[LinkedProduct] = []
     cached_count = 0
     created_count = 0
@@ -220,7 +228,7 @@ def enrich(
             selection_tier=product.selection_tier,
         ))
 
-    _save_cache(cache, config.category_id, week_of)
+    _save_cache(cache, config.category_id)
 
     # Save artifact
     artifact_path.write_text(
