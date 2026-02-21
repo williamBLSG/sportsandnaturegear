@@ -35,7 +35,7 @@ def _build_product_data(products: list[LinkedProduct]) -> str:
     """Build a JSON string of product data for the LLM prompt."""
     data = []
     for p in products:
-        data.append({
+        item = {
             "rank": p.rank,
             "brand": p.brand,
             "model": p.model,
@@ -51,7 +51,12 @@ def _build_product_data(products: list[LinkedProduct]) -> str:
             "geniuslink_url": p.affiliate_url,
             "amazon_url": p.detail_page_url,
             "primary_image_url": p.image_url,
-        })
+            "trend_source": p.trend_source,
+            "trend_query": p.trend_query,
+            "trend_search_interest": p.trend_search_interest,
+            "selection_tier": p.selection_tier,
+        }
+        data.append(item)
     return json.dumps(data, indent=2)
 
 
@@ -125,9 +130,9 @@ meta_description: 140-155 characters. Mention the #1 brand, note weekly updates,
 
 intro: 2-3 short paragraphs in <p> tags. Reference the specific week ({week_of}). Briefly explain rankings are based on sales momentum and buyer ratings (no formula details). Acknowledge choosing can feel overwhelming, then reassure. Casual, encouraging tone. Do NOT use jargon without explaining it.
 
-methodology: 1-2 short paragraphs in <p> tags explaining how products are ranked. Mention Amazon sales data, buyer ratings, and review counts. Keep it simple and transparent for Amy.
+methodology: 1-2 short paragraphs in <p> tags explaining how products are ranked. Our Heat Score combines two signals: Amazon sales momentum (best-seller rank, buyer ratings, and review counts) and what people are actually searching for on Google right now. Products that are both selling well on Amazon AND trending in Google searches rank higher. Explain this simply and transparently for Amy — no formula details, just the idea that rankings reflect both real purchases and real search interest.
 
-trend_insight: 1-2 short paragraphs in <p> tags noting any interesting trends this week (e.g., a brand dominating, price trends, new entries). Use the product data to make observations.
+trend_insight: 1-2 short paragraphs in <p> tags noting what's trending this week. Each product includes Google Trends data: trend_source ("rising" or "top"), trend_query (the actual search query trending on Google), trend_search_interest (0-100 score), and selection_tier (1=best). Use this data to write specific, grounded observations. For example: "Searches for 'brooks ghost 16' are rising on Google this week with a search interest score of 85" or "ASICS Gel-Nimbus is a top trending search right now." If a product has no trend data (trend_source is null), focus on its sales and rating momentum instead. Do NOT fabricate trend queries — use only the trend_query values from the product data.
 
 hub_summary: 1-2 sentence evergreen summary of this week's trends, suitable for a category hub page. Should read well weeks later — avoid "this week" language. Example: "Brooks and ASICS dominate the trending women's running shoes, with comfort-focused models leading buyer ratings."
 
@@ -141,18 +146,19 @@ image_alt: Descriptive alt text for the product image. Example: "Brooks Ghost 16
 
 best_for: A short phrase describing who this shoe is best for. Example: "Everyday runners looking for comfort". Keep it beginner-friendly.
 
-why_hot: 2-3 sentences explaining why this product is trending. Reference real data (rating, review count, BSR rank) — do NOT invent specs like weight, drop height, foam type, or stack height. Write in Amy's voice: casual, encouraging, beginner-friendly. Use <p> tags.
+why_hot: 2-3 sentences as plain text (no HTML tags) explaining why this product is trending. Reference real data (rating, review count, BSR rank). If the product has Google Trends data (trend_source, trend_query, trend_search_interest), mention it naturally — e.g., "Searches for '[trend_query]' are [rising/top trending] on Google right now." Do NOT invent specs like weight, drop height, foam type, or stack height. Write in Amy's voice: casual, encouraging, beginner-friendly.
 
 short_specs: A <ul> list with 3-5 items using ONLY data from the input: price, BSR rank, rating, review count. Do NOT invent specifications.
 
 CRITICAL RULES:
+- Output plain text for why_hot. No HTML tags (<p>, <ul>, <li>, etc.) in why_hot.
 - Do NOT invent product specifications (weight, drop, foam type, stack height, cushioning)
 - Do NOT make health or biomechanical claims
 - Do NOT change the rank order
 - Do NOT add products not in the input data
 - Brand and model names must match the input EXACTLY
 - Copy model_slug, geniuslink_url, amazon_url, primary_image_url exactly from input
-- Use ONLY data provided — rating, review_count, price_usd, bsr, heat_score
+- Use ONLY data provided — rating, review_count, price_usd, bsr, heat_score, trend_source, trend_query, trend_search_interest
 - If a technical term must appear, explain it in plain English in the same sentence
 - Write for both mothers and women without children — never assume one or the other
 - All numeric values (price_usd, rating, review_count, bsr, heat_score) must be numbers, not strings

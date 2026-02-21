@@ -185,6 +185,12 @@ class LinkedProduct(BaseModel):
     heat_score: float
     rank_change: str = "NEW"
     affiliate_url: str = ""
+    # Google Trends ranking fields (carried from RankedProduct)
+    trend_source: Optional[str] = None         # "rising" or "top"
+    trend_match_type: Optional[str] = None     # "brand_model" or "brand_only"
+    trend_query: Optional[str] = None          # Original Google Trends query
+    trend_search_interest: Optional[int] = None
+    selection_tier: int = 5                    # 1-5
 
     def model_post_init(self, __context) -> None:
         if not self.model_slug:

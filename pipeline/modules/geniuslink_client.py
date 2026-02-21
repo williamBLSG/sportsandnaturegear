@@ -213,6 +213,11 @@ def enrich(
             heat_score=product.heat_score,
             rank_change=product.rank_change,
             affiliate_url=affiliate_url or product.detail_page_url or "",
+            trend_source=product.trend_source,
+            trend_match_type=product.trend_match_type,
+            trend_query=product.trend_query,
+            trend_search_interest=product.trend_search_interest,
+            selection_tier=product.selection_tier,
         ))
 
     _save_cache(cache, config.category_id, week_of)
