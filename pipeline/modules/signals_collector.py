@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import logging
 import os
+import time
 from datetime import datetime, timezone
 
 from pipeline.models import CategoryConfig, RawProduct, RawSignals, runs_path
@@ -119,6 +120,8 @@ def _fetch_products(api, config: CategoryConfig) -> list[RawProduct]:
     seen_asins: set[str] = set()
 
     for page in range(1, 3):  # Pages 1 and 2
+        if page > 1:
+            time.sleep(1)  # Amazon Creators API rate limit: 1 req/sec
         logger.info("Fetching page %d for '%s'", page, config.keywords)
         try:
             search_kwargs = dict(
@@ -217,7 +220,9 @@ def _fetch_supplemental(
 
     new_products: list[RawProduct] = []
 
-    for kw in keywords:
+    for i, kw in enumerate(keywords):
+        if i > 0:
+            time.sleep(1)  # Amazon Creators API rate limit: 1 req/sec
         logger.info("Supplemental search: '%s'", kw)
         try:
             # Supplemental searches omit browse_node_id — the browse node
@@ -278,6 +283,7 @@ def collect(
 
     # Supplemental searches from trends data
     if supplemental_keywords:
+        time.sleep(1)  # Amazon Creators API rate limit: 1 req/sec
         seen_asins = {p.asin for p in all_products}
         supplemental = _fetch_supplemental(api, supplemental_keywords, config, seen_asins)
         logger.info(
