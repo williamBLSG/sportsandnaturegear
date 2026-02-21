@@ -316,10 +316,10 @@ def enrich_state_products(
         config.geniuslink_group_id, group_id,
     )
 
-    # Load per-activity cache
-    cache_path = state_runs_path(
-        state, config.activity_id, "geniuslink_cache.json",
-    )
+    # Load global state-activities cache (shared across all states/activities)
+    cache_dir = Path(__file__).resolve().parent.parent.parent / "runs" / "state-activities"
+    cache_dir.mkdir(parents=True, exist_ok=True)
+    cache_path = cache_dir / "geniuslink_cache.json"
     cache: dict[str, str] = {}
     if cache_path.exists():
         cache = json.loads(cache_path.read_text())

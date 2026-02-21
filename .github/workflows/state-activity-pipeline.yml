@@ -25,6 +25,12 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      - name: Restore GeniusLink cache
+        uses: actions/cache@v4
+        with:
+          path: runs/state-activities/geniuslink_cache.json
+          key: geniuslink-state-activities
+
       - name: Run state activity pipeline
         run: python pipeline/state_activity_run.py
         env:
