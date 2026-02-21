@@ -481,7 +481,8 @@ class StateActivityProduct(BaseModel):
     @classmethod
     def description_length(cls, v: str) -> str:
         if len(v) > 165:
-            raise ValueError(f"description must be <= 165 chars, got {len(v)}")
+            # Truncate at last word boundary within limit, add ellipsis
+            v = v[:162].rsplit(" ", 1)[0] + "..."
         return _no_em_dashes(v)
 
 
