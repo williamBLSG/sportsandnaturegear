@@ -1,0 +1,36 @@
+activity_id: cycling
+display_name: "Cycling"
+site_name: "Sports & Nature Gear"
+site_url: "https://www.sportsandnaturegear.com"
+audience: "women and families, beginner-friendly"
+table_activities: "state_activities"
+table_products: "state_activity_products"
+geniuslink_group_id: "state-cycling"
+
+# Amazon product search parameters
+search_index: "SportingGoods"
+keywords: "women's cycling gear"
+min_reviews: 50
+min_rating: 3.5
+price_min_usd: 15
+price_max_usd: 300
+assoc_tag: "${AMZ_ASSOC_TAG}"
+
+# Research source priority (used to guide search queries)
+research_sources:
+  - state_parks
+  - tourism_boards
+  - alltrails
+  - recreation_gov
+  - chambers_of_commerce
+
+# Article H2 section guidance — LLM decides which apply based on research
+h2_section_pool:
+  - Best Rides and Rail Trails
+  - When to Go
+  - Terrain What to Expect
+  - Scenic Routes and Hidden Gems
+  - Cultural and Historic Connections
+  - Local Food and Traditions
+  - Events and Festivals
+  - Gear Tips for [State]
