@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        category: [womens-running-shoes, mens-running-shoes]
+        category: [womens-running-shoes]
       fail-fast: false
     steps:
       - uses: actions/checkout@v4
