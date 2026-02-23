@@ -12,6 +12,29 @@ from pipeline.models import CategoryConfig, RawProduct, RawSignals, runs_path
 
 logger = logging.getLogger(__name__)
 
+MAX_RETRIES = 3
+BACKOFF_BASE = 2  # seconds
+
+
+def _retry(fn, retries=MAX_RETRIES, should_retry=lambda e: True):
+    """Retry a function with exponential backoff on transient errors."""
+    for attempt in range(retries):
+        try:
+            return fn()
+        except Exception as e:
+            if attempt < retries - 1 and should_retry(e):
+                wait = BACKOFF_BASE * (2 ** attempt)
+                logger.warning("Attempt %d failed: %s. Retrying in %ds...", attempt + 1, e, wait)
+                time.sleep(wait)
+            else:
+                raise
+
+
+def _is_rate_limit_error(e: Exception) -> bool:
+    """Check if an exception is a rate limit / throttling error."""
+    msg = str(e).lower()
+    return "rate limit" in msg or "throttl" in msg
+
 
 class SignalsCollectorError(Exception):
     pass
@@ -135,7 +158,10 @@ def _fetch_products(api, config: CategoryConfig) -> list[RawProduct]:
             )
             if config.browse_node_id:
                 search_kwargs["browse_node_id"] = config.browse_node_id
-            result = api.search_items(**search_kwargs)
+            result = _retry(
+                lambda: api.search_items(**search_kwargs),
+                should_retry=_is_rate_limit_error,
+            )
         except Exception as e:
             raise SignalsCollectorError(
                 f"Amazon API call failed (page {page}): {e}"
@@ -229,14 +255,18 @@ def _fetch_supplemental(
             # constrains too aggressively for targeted brand/model searches and
             # can return wrong-gender or off-category products instead of the
             # exact product we're looking for.
-            result = api.search_items(
-                keywords=kw,
-                search_index=config.search_index,
-                item_count=10,
-                item_page=1,
-                min_reviews_rating=int(config.min_rating),
-                sort_by=SortBy.FEATURED,
-                resources=resources,
+            result = _retry(
+                lambda kw=kw: api.search_items(
+                    keywords=kw,
+                    search_index=config.search_index,
+                    item_count=10,
+                    item_page=1,
+                    min_reviews_rating=int(config.min_rating),
+                    sort_by=SortBy.FEATURED,
+                    resources=resources,
+                ),
+                retries=2,
+                should_retry=_is_rate_limit_error,
             )
         except Exception as e:
             logger.warning("Supplemental search failed for '%s': %s", kw, e)

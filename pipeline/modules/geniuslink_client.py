@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import logging
 import os
+import time
 from pathlib import Path
 
 import requests
@@ -23,6 +24,30 @@ from pipeline.models import (
 logger = logging.getLogger(__name__)
 
 GENIUSLINK_BASE = "https://api.geni.us"
+
+MAX_RETRIES = 3
+BACKOFF_BASE = 2  # seconds
+
+
+def _retry(fn, retries=MAX_RETRIES, should_retry=lambda e: True):
+    """Retry a function with exponential backoff on transient errors."""
+    for attempt in range(retries):
+        try:
+            return fn()
+        except Exception as e:
+            if attempt < retries - 1 and should_retry(e):
+                wait = BACKOFF_BASE * (2 ** attempt)
+                logger.warning("Attempt %d failed: %s. Retrying in %ds...", attempt + 1, e, wait)
+                time.sleep(wait)
+            else:
+                raise
+
+
+def _is_server_error(e: Exception) -> bool:
+    """Check if an exception is a 5xx server error from requests."""
+    if isinstance(e, requests.HTTPError) and e.response is not None:
+        return e.response.status_code >= 500
+    return False
 
 
 class GeniusLinkError(Exception):
@@ -64,13 +89,17 @@ def _resolve_group_id(
     api_secret: str,
 ) -> int:
     """Look up numeric group ID by name. Raises GeniusLinkError if not found."""
-    try:
+    def _do_request():
         resp = requests.get(
             f"{GENIUSLINK_BASE}/v1/groups/get-all-with-details",
             headers=_auth_headers(api_key, api_secret),
             timeout=15,
         )
         resp.raise_for_status()
+        return resp
+
+    try:
+        resp = _retry(_do_request, should_retry=_is_server_error)
         data = resp.json()
         for group in data.get("Groups", []):
             if group["Name"] == group_name:
@@ -90,7 +119,7 @@ def _create_link(
     api_secret: str,
 ) -> tuple[str, str] | None:
     """Create a geni.us short URL. Returns (full_url, code) or None on failure."""
-    try:
+    def _do_request():
         resp = requests.post(
             f"{GENIUSLINK_BASE}/v3/shorturls",
             params={"url": detail_page_url, "groupId": group_id},
@@ -98,6 +127,10 @@ def _create_link(
             timeout=15,
         )
         resp.raise_for_status()
+        return resp
+
+    try:
+        resp = _retry(_do_request, should_retry=_is_server_error)
         data = resp.json()
         short_url = data.get("shortUrl", {})
         code = short_url.get("code")
