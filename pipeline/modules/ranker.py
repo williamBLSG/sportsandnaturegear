@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 import logging
 import os
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 import anthropic
 
@@ -321,6 +321,43 @@ def _select_top_5(
     return selected
 
 
+def _load_prior_rankings(category_id: str, week_of: str) -> dict[str, int]:
+    """Load the previous week's ranked.json and return a full_name → rank lookup.
+
+    Returns an empty dict if no prior week data exists.
+    """
+    prior_monday = datetime.strptime(week_of, "%Y-%m-%d") - timedelta(weeks=1)
+    prior_week_of = prior_monday.strftime("%Y-%m-%d")
+    prior_path = runs_path(category_id, prior_week_of, "ranked.json")
+
+    if not prior_path.exists():
+        logger.info("No prior week ranked.json at %s", prior_path)
+        return {}
+
+    try:
+        prior = RankedOutput.model_validate_json(prior_path.read_text())
+        lookup = {p.full_name: p.rank for p in prior.products}
+        logger.info("Loaded prior rankings (%s): %d products", prior_week_of, len(lookup))
+        return lookup
+    except Exception as e:
+        logger.warning("Failed to load prior rankings: %s", e)
+        return {}
+
+
+def _compute_rank_change(current_rank: int, full_name: str, prior: dict[str, int]) -> str:
+    """Compute rank_change string from current rank and prior week lookup.
+
+    Returns "NEW" if not in prior week, "=" if same rank, "+N" if improved, "-N" if dropped.
+    """
+    if not prior or full_name not in prior:
+        return "NEW"
+    old_rank = prior[full_name]
+    if old_rank == current_rank:
+        return "="
+    diff = old_rank - current_rank  # positive = improved (lower rank number is better)
+    return f"+{diff}" if diff > 0 else str(diff)
+
+
 def rank(
     signals: RawSignals,
     config: CategoryConfig,
@@ -388,6 +425,9 @@ def rank(
         scored.sort(key=lambda x: x[2], reverse=True)
         top_5 = [(p, n, h, None, None, 5) for p, n, h in scored[:top_n]]
 
+    # Step 5: Load prior week rankings for rank_change computation
+    prior_rankings = _load_prior_rankings(config.category_id, week_of)
+
     ranked_products = []
     for i, (product, norm, heat, tq, match_type, tier) in enumerate(top_5, start=1):
         ranked_products.append(RankedProduct(
@@ -404,7 +444,7 @@ def rank(
             image_url=product.image_url,
             detail_page_url=product.detail_page_url,
             heat_score=heat,
-            rank_change="NEW",
+            rank_change=_compute_rank_change(i, norm["full_name"], prior_rankings),
             trend_source=tq.source if tq else None,
             trend_match_type=match_type,
             trend_query=tq.query if tq else None,

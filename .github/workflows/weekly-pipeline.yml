@@ -32,6 +32,14 @@ jobs:
           path: runs/${{ matrix.category }}/geniuslink_cache.json
           key: geniuslink-${{ matrix.category }}
 
+      - name: Restore prior week ranked data
+        uses: actions/cache@v4
+        with:
+          path: runs/${{ matrix.category }}/*/ranked.json
+          key: ranked-${{ matrix.category }}-${{ github.run_id }}
+          restore-keys: |
+            ranked-${{ matrix.category }}-
+
       - name: Run weekly pipeline
         if: ${{ github.event.inputs.category == '' || github.event.inputs.category == matrix.category }}
         run: python pipeline/run.py --category ${{ matrix.category }}
