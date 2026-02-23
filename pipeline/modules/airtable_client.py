@@ -68,7 +68,7 @@ def _roundup_fields(roundup: WeeklyRoundup) -> dict:
     # Hub page fields — computed from roundup data
     top_product = roundup.products[0] if roundup.products else None
     image_url = (top_product.primary_image_url or "") if top_product else ""
-    hub_title = f"{roundup.h1_title} — Week of {roundup.week_of}"
+    hub_title = roundup.h1_title
     button_cta = f"See the Top 5 for {roundup.week_of} →"
 
     fields: dict = {
