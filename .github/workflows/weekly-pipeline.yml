@@ -8,6 +8,10 @@ on:
       category:
         description: "Override category (e.g. womens-running-shoes). Leave blank to run all."
         required: false
+      force:
+        description: "Force re-run, ignoring cached artifacts (true/false)"
+        required: false
+        default: "false"
 
 jobs:
   run-pipeline:
@@ -42,7 +46,12 @@ jobs:
 
       - name: Run weekly pipeline
         if: ${{ github.event.inputs.category == '' || github.event.inputs.category == matrix.category }}
-        run: python pipeline/run.py --category ${{ matrix.category }}
+        run: |
+          FORCE_FLAG=""
+          if [ "${{ github.event.inputs.force }}" = "true" ]; then
+            FORCE_FLAG="--force"
+          fi
+          python pipeline/run.py --category ${{ matrix.category }} $FORCE_FLAG
         env:
           AMZ_CREATORS_ACCESS_KEY: ${{ secrets.AMZ_CREATORS_ACCESS_KEY }}
           AMZ_CREATORS_SECRET_KEY: ${{ secrets.AMZ_CREATORS_SECRET_KEY }}
