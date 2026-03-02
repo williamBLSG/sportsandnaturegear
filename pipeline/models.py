@@ -75,7 +75,9 @@ class CategoryConfig(BaseModel):
     trends_keyword: Optional[str] = None  # Falls back to `keywords` if absent
     trends_timeframe: str = "now 7-d"
     trends_geo: str = "US"
-    trends_max_supplemental_searches: int = 8
+    trends_max_supplemental_searches: int = 11
+    fallback_supplemental_brands: list[str] = Field(default_factory=list)
+    min_ranked_products: int = 3
 
 
 # ---------------------------------------------------------------------------

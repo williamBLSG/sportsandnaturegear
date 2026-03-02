@@ -73,6 +73,21 @@ def _build_supplemental_keywords(
     return keywords
 
 
+def _build_fallback_keywords(config: CategoryConfig) -> list[str]:
+    """Build supplemental Amazon search keywords from fallback brands in config.
+
+    Used when Google Trends is unavailable (429, timeout, etc.) to ensure
+    the product pool still includes major brands.
+    """
+    keywords: list[str] = []
+    for brand in config.fallback_supplemental_brands:
+        kw = f"{brand} {config.gender}'s {config.product_type}"
+        keywords.append(kw)
+        if len(keywords) >= config.trends_max_supplemental_searches:
+            break
+    return keywords
+
+
 def _save_run_log(run_log: RunLog, week_of: str) -> None:
     """Save run log to the runs directory."""
     path = runs_path(run_log.category_id, week_of, "run_log.json")
@@ -116,6 +131,10 @@ def main(category_id: str, force: bool = False) -> None:
     if supplemental:
         run_log.trends_supplemental_searches = len(supplemental)
         logger.info("Built %d supplemental keywords from trends", len(supplemental))
+    elif config.fallback_supplemental_brands:
+        supplemental = _build_fallback_keywords(config)
+        run_log.trends_supplemental_searches = len(supplemental)
+        logger.info("Trends unavailable — using %d fallback brand keywords", len(supplemental))
 
     try:
         signals = collect_signals(config, week_of, supplemental_keywords=supplemental, force=force)
@@ -142,6 +161,20 @@ def main(category_id: str, force: bool = False) -> None:
         sys.exit(1)
 
     run_log.products_ranked = ranked.product_count
+
+    # --- Guard: Minimum product count ---
+    if ranked.product_count < config.min_ranked_products:
+        msg = (
+            f"Only {ranked.product_count} product(s) ranked — "
+            f"minimum is {config.min_ranked_products}. "
+            f"Aborting to avoid publishing a degraded roundup."
+        )
+        logger.error(msg)
+        run_log.status = "failed"
+        run_log.error = msg
+        run_log.run_completed_at = datetime.now(timezone.utc)
+        _save_run_log(run_log, week_of)
+        sys.exit(1)
 
     # --- Step 5: Enrich with GeniusLink affiliate URLs ---
     try:

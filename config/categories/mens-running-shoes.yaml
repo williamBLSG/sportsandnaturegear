@@ -20,3 +20,15 @@ assoc_tag: "${AMZ_ASSOC_TAG}"
 geniuslink_group_id: "mens-running-shoes"
 schedule: "every_monday_6am_pt"
 trends_keyword: "men's running shoes"
+fallback_supplemental_brands:
+  - Nike
+  - Brooks
+  - ASICS
+  - New Balance
+  - Hoka
+  - "On"
+  - Adidas
+  - Saucony
+  - Altra
+  - Puma
+  - Reebok
