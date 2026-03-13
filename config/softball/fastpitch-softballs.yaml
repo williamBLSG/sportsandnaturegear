@@ -1,0 +1,68 @@
+# ── Softball Article Config ──────────────────────────────────────
+# Pipeline: softball daily article builder
+# Architecture doc: softball/Softball Category Architecture.docx
+
+article_id: fastpitch-softballs
+category_id: softball
+display_name: "Fastpitch Softballs"
+site_name: "Sports & Nature Gear"
+site_url: "https://www.sportsandnaturegear.com"
+
+# ── Amazon Creators API ─────────────────────────────────────────
+search_index: SportingGoods
+keywords: "fastpitch softballs"
+min_reviews: 10
+min_rating: 2.5
+price_min_usd: 5
+price_max_usd: 150
+product_count_target: 7
+
+top_brands:
+  - Rawlings
+  - Dudley
+  - Worth
+  - Wilson
+  - Champro
+  - Diamond
+
+# ── Affiliate ────────────────────────────────────────────────────
+assoc_tag: "${AMZ_ASSOC_TAG}"
+geniuslink_group_id: "softball"
+geniuslink_group_numeric_id: 421626
+
+# ── SEO & Page ───────────────────────────────────────────────────
+slug: "/softball/softball-gear/fastpitch-softballs"
+page_title: "Best Fastpitch Softballs: Game Balls, Practice Balls, and Bulk Packs"
+meta_title: "Best Fastpitch Softballs 2026: Practice, Game & Team Packs"
+meta_description: "Need fastpitch softballs? We break down the best options for practice, games, and team bulk orders — with current prices and real picks."
+primary_keyword: "fastpitch softballs"
+secondary_keywords:
+  - best fastpitch softballs
+  - 12 inch fastpitch softballs
+  - ASA approved fastpitch softballs
+  - practice fastpitch softballs
+  - fastpitch softball bulk
+  - youth fastpitch softballs
+target_word_count_min: 1600
+target_word_count_max: 2000
+
+# ── Google Trends ────────────────────────────────────────────────
+trends_keyword: "fastpitch softballs"
+
+# ── Editorial ────────────────────────────────────────────────────
+editorial_notes: >
+  Shorter guide is fine here — buyers have narrower questions (12" vs. 11",
+  compression rating, approval stamp). Differentiate clearly between game balls
+  vs. practice/training balls. Bulk pack pricing comparison adds real value.
+  Worth noting which balls are approved for specific leagues (NFHS, ASA, USSSA).
+
+# ── Airtable ─────────────────────────────────────────────────────
+airtable_base_id: "${AIRTABLE_SOFTBALL_BASE_ID}"
+table_articles: "softball-articles"
+table_products: "softball-products"
+table_faq: "softball-faq"
+
+# ── Internal Links ───────────────────────────────────────────────
+internal_links:
+  - anchor: "fastpitch bats"
+    slug: "/softball/softball-gear/fastpitch-softball-bats"

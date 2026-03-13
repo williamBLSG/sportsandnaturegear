@@ -1,0 +1,69 @@
+# ── Softball Article Config ──────────────────────────────────────
+# Pipeline: softball daily article builder
+# Architecture doc: softball/Softball Category Architecture.docx
+
+article_id: slowpitch-softball-gloves
+category_id: softball
+display_name: "Slowpitch Softball Gloves"
+site_name: "Sports & Nature Gear"
+site_url: "https://www.sportsandnaturegear.com"
+
+# ── Amazon Creators API ─────────────────────────────────────────
+search_index: SportingGoods
+keywords: "slowpitch softball gloves"
+min_reviews: 10
+min_rating: 2.5
+price_min_usd: 20
+price_max_usd: 350
+product_count_target: 7
+
+top_brands:
+  - Rawlings
+  - Wilson
+  - Mizuno
+  - Nokona
+  - Easton
+  - Louisville Slugger
+  - Franklin
+
+# ── Affiliate ────────────────────────────────────────────────────
+assoc_tag: "${AMZ_ASSOC_TAG}"
+geniuslink_group_id: "softball"
+geniuslink_group_numeric_id: 421626
+
+# ── SEO & Page ───────────────────────────────────────────────────
+slug: "/softball/softball-gear/slowpitch-softball-gloves"
+page_title: "Best Slowpitch Softball Gloves: Comfort and Durability for Adult Players"
+meta_title: "Best Slowpitch Softball Gloves 2026: Comfort Picks for Adults"
+meta_description: "Shopping for slowpitch gloves? Our guide covers the most comfortable, durable picks for adult rec leagues — by position and budget."
+primary_keyword: "slowpitch softball gloves"
+secondary_keywords:
+  - best slowpitch softball gloves
+  - softball gloves for adults
+  - slowpitch gloves women
+  - recreational softball gloves
+  - adult softball gloves
+  - slowpitch outfield gloves
+target_word_count_min: 1800
+target_word_count_max: 2200
+
+# ── Google Trends ────────────────────────────────────────────────
+trends_keyword: "slowpitch softball gloves"
+
+# ── Editorial ────────────────────────────────────────────────────
+editorial_notes: >
+  Audience is adult recreational players, many of whom haven't bought a glove
+  in years. Comfort and break-in ease are bigger selling points than performance
+  specs. Larger glove sizes (13"+) for outfield. Many buyers in this category
+  appreciate leather vs. synthetic breakdown. Women's fit differences worth a
+  dedicated section.
+
+# ── Airtable ─────────────────────────────────────────────────────
+airtable_base_id: "${AIRTABLE_SOFTBALL_BASE_ID}"
+table_articles: "softball-articles"
+table_products: "softball-products"
+table_faq: "softball-faq"
+
+# ── Internal Links ───────────────────────────────────────────────
+# No cross-links specified in architecture doc for this page
+internal_links: []

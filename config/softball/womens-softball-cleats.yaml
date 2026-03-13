@@ -1,0 +1,69 @@
+# ── Softball Article Config ──────────────────────────────────────
+# Pipeline: softball daily article builder
+# Architecture doc: softball/Softball Category Architecture.docx
+
+article_id: womens-softball-cleats
+category_id: softball
+display_name: "Women's Softball Cleats"
+site_name: "Sports & Nature Gear"
+site_url: "https://www.sportsandnaturegear.com"
+
+# ── Amazon Creators API ─────────────────────────────────────────
+search_index: SportingGoods
+keywords: "women's softball cleats"
+min_reviews: 10
+min_rating: 2.5
+price_min_usd: 25
+price_max_usd: 200
+product_count_target: 7
+
+top_brands:
+  - Mizuno
+  - New Balance
+  - Under Armour
+  - Nike
+  - Adidas
+  - Ringor
+
+# ── Affiliate ────────────────────────────────────────────────────
+assoc_tag: "${AMZ_ASSOC_TAG}"
+geniuslink_group_id: "softball"
+geniuslink_group_numeric_id: 421626
+
+# ── SEO & Page ───────────────────────────────────────────────────
+slug: "/softball/softball-gear/womens-softball-cleats"
+page_title: "Best Women's Softball Cleats: Top Picks for Grip, Comfort, and Performance"
+meta_title: "Best Women's Softball Cleats 2026: Grip, Fit & Top Picks"
+meta_description: "Find the best women's softball cleats for your league and position. We cover top picks for rec players, travel ball, and competitive adults."
+primary_keyword: "women's softball cleats"
+secondary_keywords:
+  - best women's softball cleats
+  - women's fastpitch cleats
+  - women's slowpitch cleats
+  - women's metal softball cleats
+  - softball cleats wide width women
+  - adult women softball cleats
+target_word_count_min: 2200
+target_word_count_max: 2500
+
+# ── Google Trends ────────────────────────────────────────────────
+trends_keyword: "women's softball cleats"
+
+# ── Editorial ────────────────────────────────────────────────────
+editorial_notes: >
+  Distinct from girls page: adult sizing (women's 5-12), metal cleats are
+  standard for competitive play, wide-width options are a real pain point for
+  adult women. Position breakdowns same as girls guide but adult-focused. Rec
+  league audience skews older — comfort and durability over pure performance.
+  Internal link to girls page for parents shopping for daughters.
+
+# ── Airtable ─────────────────────────────────────────────────────
+airtable_base_id: "${AIRTABLE_SOFTBALL_BASE_ID}"
+table_articles: "softball-articles"
+table_products: "softball-products"
+table_faq: "softball-faq"
+
+# ── Internal Links ───────────────────────────────────────────────
+internal_links:
+  - anchor: "girls softball cleats"
+    slug: "/softball/softball-gear/girls-softball-cleats"

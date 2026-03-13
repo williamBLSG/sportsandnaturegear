@@ -1,0 +1,70 @@
+# ── Softball Article Config ──────────────────────────────────────
+# Pipeline: softball daily article builder
+# Architecture doc: softball/Softball Category Architecture.docx
+
+article_id: slowpitch-softballs
+category_id: softball
+display_name: "Slowpitch Softballs"
+site_name: "Sports & Nature Gear"
+site_url: "https://www.sportsandnaturegear.com"
+
+# ── Amazon Creators API ─────────────────────────────────────────
+search_index: SportingGoods
+keywords: "slowpitch softballs"
+min_reviews: 10
+min_rating: 2.5
+price_min_usd: 5
+price_max_usd: 150
+product_count_target: 7
+
+top_brands:
+  - Dudley
+  - Worth
+  - Rawlings
+  - Wilson
+  - Champro
+  - Diamond
+  - Trump
+
+# ── Affiliate ────────────────────────────────────────────────────
+assoc_tag: "${AMZ_ASSOC_TAG}"
+geniuslink_group_id: "softball"
+geniuslink_group_numeric_id: 421626
+
+# ── SEO & Page ───────────────────────────────────────────────────
+slug: "/softball/softball-gear/slowpitch-softballs"
+page_title: "Best Slowpitch Softballs: Game Balls, Bulk Packs, and What to Know Before You Buy"
+meta_title: "Best Slowpitch Softballs 2026: League Picks and Bulk Packs"
+meta_description: "Need slowpitch softballs for your league or backyard? We cover approved game balls, team bulk packs, and the best practice options."
+primary_keyword: "slowpitch softballs"
+secondary_keywords:
+  - best slowpitch softballs
+  - 12 inch slowpitch softballs
+  - ASA approved slowpitch softballs
+  - slowpitch softball bulk pack
+  - USSSA slowpitch softballs
+  - co-ed softball balls
+target_word_count_min: 1600
+target_word_count_max: 2000
+
+# ── Google Trends ────────────────────────────────────────────────
+trends_keyword: "slowpitch softballs"
+
+# ── Editorial ────────────────────────────────────────────────────
+editorial_notes: >
+  Same format as fastpitch softballs but different compression ratings and
+  approval stamps. 12" is standard for slowpitch adult leagues. COR and
+  compression numbers (e.g., .44 COR / 375 compression) are the key spec to
+  explain simply. Co-ed league ball rules can differ from single-gender —
+  worth a callout box.
+
+# ── Airtable ─────────────────────────────────────────────────────
+airtable_base_id: "${AIRTABLE_SOFTBALL_BASE_ID}"
+table_articles: "softball-articles"
+table_products: "softball-products"
+table_faq: "softball-faq"
+
+# ── Internal Links ───────────────────────────────────────────────
+internal_links:
+  - anchor: "slowpitch bat guide"
+    slug: "/softball/softball-gear/slowpitch-softball-bats"

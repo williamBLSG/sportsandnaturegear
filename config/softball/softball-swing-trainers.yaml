@@ -1,0 +1,72 @@
+# ── Softball Article Config ──────────────────────────────────────
+# Pipeline: softball daily article builder
+# Architecture doc: softball/Softball Category Architecture.docx
+
+article_id: softball-swing-trainers
+category_id: softball
+display_name: "Softball Swing Trainers"
+site_name: "Sports & Nature Gear"
+site_url: "https://www.sportsandnaturegear.com"
+
+# ── Amazon Creators API ─────────────────────────────────────────
+search_index: SportingGoods
+keywords: "softball swing trainers"
+min_reviews: 10
+min_rating: 2.5
+price_min_usd: 10
+price_max_usd: 400
+product_count_target: 7
+
+top_brands:
+  - SKLZ
+  - Easton
+  - Louisville Slugger
+  - Rawlings
+  - Jugs
+  - Tanner Tees
+  - SwingRail
+
+# ── Affiliate ────────────────────────────────────────────────────
+assoc_tag: "${AMZ_ASSOC_TAG}"
+geniuslink_group_id: "softball"
+geniuslink_group_numeric_id: 421626
+
+# ── SEO & Page ───────────────────────────────────────────────────
+slug: "/softball/softball-gear/softball-swing-trainers"
+page_title: "Best Softball Swing Trainers: Tools That Actually Improve Your Game"
+meta_title: "Best Softball Swing Trainers 2026: Hit Better at Any Level"
+meta_description: "Looking for a softball swing trainer? We compare the best options for beginners through competitive players — by age, skill level, and budget."
+primary_keyword: "softball swing trainers"
+secondary_keywords:
+  - best softball swing trainer
+  - softball hitting aids
+  - softball batting trainer
+  - softball swing training tools
+  - youth softball swing trainer
+  - softball tee training
+target_word_count_min: 1800
+target_word_count_max: 2200
+
+# ── Google Trends ────────────────────────────────────────────────
+trends_keyword: "softball swing trainer"
+
+# ── Editorial ────────────────────────────────────────────────────
+editorial_notes: >
+  Broader product category — covers batting tees, weighted training bats,
+  connection balls, pitching machines used for hitting practice. Segment by use
+  case: solo backyard practice vs. team practice vs. coached training. Strong
+  beginner audience who wants to practice between games. Video demo links add
+  value here. Internal link to bat guides.
+
+# ── Airtable ─────────────────────────────────────────────────────
+airtable_base_id: "${AIRTABLE_SOFTBALL_BASE_ID}"
+table_articles: "softball-articles"
+table_products: "softball-products"
+table_faq: "softball-faq"
+
+# ── Internal Links ───────────────────────────────────────────────
+internal_links:
+  - anchor: "fastpitch softball bats"
+    slug: "/softball/softball-gear/fastpitch-softball-bats"
+  - anchor: "slowpitch softball bats"
+    slug: "/softball/softball-gear/slowpitch-softball-bats"

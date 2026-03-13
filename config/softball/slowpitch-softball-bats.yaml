@@ -1,0 +1,71 @@
+# ── Softball Article Config ──────────────────────────────────────
+# Pipeline: softball daily article builder
+# Architecture doc: softball/Softball Category Architecture.docx
+
+article_id: slowpitch-softball-bats
+category_id: softball
+display_name: "Slowpitch Softball Bats"
+site_name: "Sports & Nature Gear"
+site_url: "https://www.sportsandnaturegear.com"
+
+# ── Amazon Creators API ─────────────────────────────────────────
+search_index: SportingGoods
+keywords: "slowpitch softball bats"
+min_reviews: 10
+min_rating: 2.5
+price_min_usd: 30
+price_max_usd: 500
+product_count_target: 7
+
+top_brands:
+  - Louisville Slugger
+  - DeMarini
+  - Easton
+  - Miken
+  - Worth
+  - Mizuno
+  - Rawlings
+
+# ── Affiliate ────────────────────────────────────────────────────
+assoc_tag: "${AMZ_ASSOC_TAG}"
+geniuslink_group_id: "softball"
+geniuslink_group_numeric_id: 421626
+
+# ── SEO & Page ───────────────────────────────────────────────────
+slug: "/softball/softball-gear/slowpitch-softball-bats"
+page_title: "Best Slowpitch Softball Bats: Top Picks for Rec Leagues and Tournaments"
+meta_title: "Best Slowpitch Softball Bats 2026: Power, Pop & Top Picks"
+meta_description: "Looking for the best slowpitch softball bat? We compare top picks for rec leagues, tournaments, and seniors — with clear upgrade guidance."
+primary_keyword: "slowpitch softball bats"
+secondary_keywords:
+  - best slowpitch softball bats
+  - slowpitch softball bats for women
+  - senior slowpitch softball bats
+  - ASA slowpitch bats
+  - USSSA slowpitch bats
+  - slowpitch bat reviews 2026
+target_word_count_min: 2000
+target_word_count_max: 2400
+
+# ── Google Trends ────────────────────────────────────────────────
+trends_keyword: "slowpitch softball bats"
+
+# ── Editorial ────────────────────────────────────────────────────
+editorial_notes: >
+  Different audience than fastpitch — often recreational adults, co-ed leagues,
+  or senior leagues. Women's grip and swing weight matter here more than youth
+  sizing. Approval stamps are still critical (ASA/USA vs. USSSA differ
+  significantly). End-loaded vs. balanced is the key buyer education moment.
+
+# ── Airtable ─────────────────────────────────────────────────────
+airtable_base_id: "${AIRTABLE_SOFTBALL_BASE_ID}"
+table_articles: "softball-articles"
+table_products: "softball-products"
+table_faq: "softball-faq"
+
+# ── Internal Links ───────────────────────────────────────────────
+internal_links:
+  - anchor: "slowpitch gloves"
+    slug: "/softball/softball-gear/slowpitch-softball-gloves"
+  - anchor: "batting trainer"
+    slug: "/softball/softball-gear/softball-swing-trainers"

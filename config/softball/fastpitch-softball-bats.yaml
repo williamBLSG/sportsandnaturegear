@@ -1,0 +1,71 @@
+# ── Softball Article Config ──────────────────────────────────────
+# Pipeline: softball daily article builder
+# Architecture doc: softball/Softball Category Architecture.docx
+
+article_id: fastpitch-softball-bats
+category_id: softball
+display_name: "Fastpitch Softball Bats"
+site_name: "Sports & Nature Gear"
+site_url: "https://www.sportsandnaturegear.com"
+
+# ── Amazon Creators API ─────────────────────────────────────────
+search_index: SportingGoods       # fallback: "All" if no results
+keywords: "fastpitch softball bats"
+min_reviews: 10
+min_rating: 2.5
+price_min_usd: 30
+price_max_usd: 500
+product_count_target: 7           # comparison table size (5-7 flexible)
+
+top_brands:
+  - Louisville Slugger
+  - DeMarini
+  - Easton
+  - Rawlings
+  - Mizuno
+  - Axe Bat
+  - Marucci
+
+# ── Affiliate ────────────────────────────────────────────────────
+assoc_tag: "${AMZ_ASSOC_TAG}"
+geniuslink_group_id: "softball"
+geniuslink_group_numeric_id: 421626
+
+# ── SEO & Page ───────────────────────────────────────────────────
+slug: "/softball/softball-gear/fastpitch-softball-bats"
+page_title: "Best Fastpitch Softball Bats: Top Picks for Every Age and League"
+meta_title: "Best Fastpitch Softball Bats 2026: Top Picks for Every Level"
+meta_description: "Find the best fastpitch softball bat for your game. We compare top picks by age, league, and budget so you can swing with confidence."
+primary_keyword: "fastpitch softball bats"
+secondary_keywords:
+  - best fastpitch softball bats
+  - fastpitch softball bats for girls
+  - youth fastpitch softball bats
+  - fastpitch bat reviews
+  - ASA fastpitch bats
+  - USSSA fastpitch bats
+target_word_count_min: 2200
+target_word_count_max: 2600
+
+# ── Google Trends ────────────────────────────────────────────────
+trends_keyword: "fastpitch softball bats"
+
+# ── Editorial ────────────────────────────────────────────────────
+editorial_notes: >
+  Lead with approval stamps (ASA/USA, USSSA, NSA) — this is the #1 confusion
+  point for buyers. Include a size/weight chart by age. Segment by rec vs.
+  travel ball. Strong affiliate potential: Louisville Slugger, DeMarini,
+  Easton, Rawlings.
+
+# ── Airtable ─────────────────────────────────────────────────────
+airtable_base_id: "${AIRTABLE_SOFTBALL_BASE_ID}"
+table_articles: "softball-articles"
+table_products: "softball-products"
+table_faq: "softball-faq"
+
+# ── Internal Links ───────────────────────────────────────────────
+internal_links:
+  - anchor: "softball swing trainer"
+    slug: "/softball/softball-gear/softball-swing-trainers"
+  - anchor: "fastpitch gloves"
+    slug: "/softball/softball-gear/fastpitch-softball-gloves"

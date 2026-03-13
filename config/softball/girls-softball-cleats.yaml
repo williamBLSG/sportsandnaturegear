@@ -1,0 +1,69 @@
+# ── Softball Article Config ──────────────────────────────────────
+# Pipeline: softball daily article builder
+# Architecture doc: softball/Softball Category Architecture.docx
+
+article_id: girls-softball-cleats
+category_id: softball
+display_name: "Girls Softball Cleats"
+site_name: "Sports & Nature Gear"
+site_url: "https://www.sportsandnaturegear.com"
+
+# ── Amazon Creators API ─────────────────────────────────────────
+search_index: SportingGoods
+keywords: "girls softball cleats"
+min_reviews: 10
+min_rating: 2.5
+price_min_usd: 20
+price_max_usd: 150
+product_count_target: 7
+
+top_brands:
+  - Mizuno
+  - New Balance
+  - Under Armour
+  - Nike
+  - Adidas
+  - Ringor
+
+# ── Affiliate ────────────────────────────────────────────────────
+assoc_tag: "${AMZ_ASSOC_TAG}"
+geniuslink_group_id: "softball"
+geniuslink_group_numeric_id: 421626
+
+# ── SEO & Page ───────────────────────────────────────────────────
+slug: "/softball/softball-gear/girls-softball-cleats"
+page_title: "Best Girls Softball Cleats: Finding the Right Fit for Every Player"
+meta_title: "Best Girls Softball Cleats 2026: Finding the Right Fit"
+meta_description: "Looking for the best girls softball cleats? We break down top picks by age, position, and budget so you can shop with confidence. Updated for 2026."
+primary_keyword: "girls softball cleats"
+secondary_keywords:
+  - softball cleats for girls
+  - youth softball cleats
+  - best girls softball cleats
+  - girls fastpitch softball cleats
+  - softball cleats kids
+  - molded softball cleats girls
+target_word_count_min: 2400
+target_word_count_max: 2700
+
+# ── Google Trends ────────────────────────────────────────────────
+trends_keyword: "girls softball cleats"
+
+# ── Editorial ────────────────────────────────────────────────────
+editorial_notes: >
+  Rebuild to automated format. Covers ages 6-16, position breakdowns, size
+  guide, rec vs. travel guidance. Reference existing Girls_Softball_Cleats_Guide.docx
+  for editorial tone and structure.
+
+# ── Airtable ─────────────────────────────────────────────────────
+airtable_base_id: "${AIRTABLE_SOFTBALL_BASE_ID}"
+table_articles: "softball-articles"
+table_products: "softball-products"
+table_faq: "softball-faq"
+
+# ── Internal Links ───────────────────────────────────────────────
+internal_links:
+  - anchor: "fastpitch gloves for girls"
+    slug: "/softball/softball-gear/fastpitch-softball-gloves"
+  - anchor: "women's softball cleats"
+    slug: "/softball/softball-gear/womens-softball-cleats"

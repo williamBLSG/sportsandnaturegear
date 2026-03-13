@@ -1,0 +1,69 @@
+# ── Softball Article Config ──────────────────────────────────────
+# Pipeline: softball daily article builder
+# Architecture doc: softball/Softball Category Architecture.docx
+
+article_id: fastpitch-softball-gloves
+category_id: softball
+display_name: "Fastpitch Softball Gloves"
+site_name: "Sports & Nature Gear"
+site_url: "https://www.sportsandnaturegear.com"
+
+# ── Amazon Creators API ─────────────────────────────────────────
+search_index: SportingGoods
+keywords: "fastpitch softball gloves"
+min_reviews: 10
+min_rating: 2.5
+price_min_usd: 20
+price_max_usd: 400
+product_count_target: 7
+
+top_brands:
+  - Rawlings
+  - Wilson
+  - Mizuno
+  - Nokona
+  - Easton
+  - Louisville Slugger
+  - Franklin
+
+# ── Affiliate ────────────────────────────────────────────────────
+assoc_tag: "${AMZ_ASSOC_TAG}"
+geniuslink_group_id: "softball"
+geniuslink_group_numeric_id: 421626
+
+# ── SEO & Page ───────────────────────────────────────────────────
+slug: "/softball/softball-gear/fastpitch-softball-gloves"
+page_title: "Best Fastpitch Softball Gloves: What to Buy for Every Position"
+meta_title: "Best Fastpitch Softball Gloves 2026: Fit, Position & Budget"
+meta_description: "Shopping for fastpitch gloves? Our guide covers the best picks by position, hand size, and price — no jargon, just real recommendations."
+primary_keyword: "fastpitch softball gloves"
+secondary_keywords:
+  - best fastpitch softball gloves
+  - fastpitch gloves for girls
+  - youth fastpitch softball gloves
+  - softball gloves by position
+  - softball gloves for pitchers
+  - softball gloves for outfield
+target_word_count_min: 2000
+target_word_count_max: 2400
+
+# ── Google Trends ────────────────────────────────────────────────
+trends_keyword: "fastpitch softball gloves"
+
+# ── Editorial ────────────────────────────────────────────────────
+editorial_notes: >
+  Position-specific breakdowns are the hook here (12" infield vs. 13" outfield
+  vs. closed-web pitchers glove). Sizing by hand circumference, not age.
+  Rawlings, Wilson, Mizuno, and Nokona are the key brands. Break-in time is a
+  real pain point — address it directly.
+
+# ── Airtable ─────────────────────────────────────────────────────
+airtable_base_id: "${AIRTABLE_SOFTBALL_BASE_ID}"
+table_articles: "softball-articles"
+table_products: "softball-products"
+table_faq: "softball-faq"
+
+# ── Internal Links ───────────────────────────────────────────────
+internal_links:
+  - anchor: "fastpitch softball bats"
+    slug: "/softball/softball-gear/fastpitch-softball-bats"
