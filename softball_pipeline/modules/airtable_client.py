@@ -74,7 +74,7 @@ def _upsert_article(
     """
     table = api.table(config.airtable_base_id, config.table_articles)
 
-    now_iso = datetime.now(timezone.utc).isoformat()
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
 
     fields = {
         "article_id": config.article_id,
@@ -138,7 +138,7 @@ def _upsert_products(
     """
     table = api.table(config.airtable_base_id, config.table_products)
 
-    now_iso = datetime.now(timezone.utc).isoformat()
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
 
     # Find existing products for this article
     existing = table.all(formula=f"{{article_id}}='{config.article_id}'")
@@ -177,7 +177,7 @@ def _upsert_products(
             "best_for": product.best_for,
             "standout_feature": product.standout_feature,
             "editorial_blurb": product.editorial_blurb,
-            "last_updated": now_iso,
+            "last_updated": today,
         }
 
         if product.asin in existing_by_asin:
@@ -353,10 +353,10 @@ def update_product_price(
         logger.warning("Product not found for price update: %s / %s", config.article_id, asin)
         return
 
-    now_iso = datetime.now(timezone.utc).isoformat()
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     table.update(existing[0]["id"], {
         "price_usd": new_price,
-        "last_updated": now_iso,
+        "last_updated": today,
     })
     logger.info("Updated price for %s: $%.2f", asin, new_price)
 
