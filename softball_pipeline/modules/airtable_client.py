@@ -45,6 +45,22 @@ class AirtableClientError(Exception):
     pass
 
 
+# Map pipeline role values → Airtable Single Select options
+# Airtable options: Main Pick, Runner Up, Budget Pick, Upgrade Pick, Honorable Mention, Other
+ROLE_MAP = {
+    "top_pick": "Main Pick",
+    "budget_pick": "Budget Pick",
+    "midrange_pick": "Runner Up",
+    "premium_pick": "Upgrade Pick",
+    "comparison": "Honorable Mention",
+}
+
+
+def _map_role(raw_role: str) -> str:
+    """Translate pipeline role value to Airtable select option."""
+    return ROLE_MAP.get(raw_role, "Other")
+
+
 def _strip_html(html: str) -> str:
     """Strip HTML tags for display-only fields."""
     return re.sub(r"<[^>]+>", "", html).strip()
@@ -165,7 +181,7 @@ def _upsert_products(
             "product_id": product_id,
             "article_id": config.article_id,
             "asin": product.asin,
-            "role": product.role,
+            "role": _map_role(product.role),
             "brand": product.brand,
             "model": product.model,
             "price_usd": product.price_usd,
