@@ -124,11 +124,14 @@ def _create_link(
             resp.raise_for_status()
 
             data = resp.json()
-            short_url = data.get("ShortUrl") or data.get("shortUrl") or data.get("url")
-            if not short_url:
-                raise GeniusLinkError(f"No short URL in GeniusLink response for ASIN {asin}: {data}")
-
-            return short_url
+            short_url_obj = data.get("shortUrl") or data.get("ShortUrl") or {}
+            if isinstance(short_url_obj, str):
+                return short_url_obj
+            code = short_url_obj.get("code")
+            domain = short_url_obj.get("domain", "geni.us")
+            if code:
+                return f"https://{domain}/{code}"
+            raise GeniusLinkError(f"No short URL code in GeniusLink response for ASIN {asin}: {data}")
 
         except requests.RequestException as e:
             if attempt == 0:
