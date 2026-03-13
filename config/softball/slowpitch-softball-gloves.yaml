@@ -9,7 +9,7 @@ site_name: "Sports & Nature Gear"
 site_url: "https://www.sportsandnaturegear.com"
 
 # ── Amazon Creators API ─────────────────────────────────────────
-search_index: SportingGoods
+search_index: SportsAndOutdoors
 keywords: "slowpitch softball gloves"
 min_reviews: 10
 min_rating: 2.5
