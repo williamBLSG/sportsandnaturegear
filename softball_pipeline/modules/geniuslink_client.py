@@ -73,6 +73,15 @@ def _resolve_group_id(
     return group_numeric_id
 
 
+def _auth_headers(api_key: str, api_secret: str) -> dict:
+    """Build auth headers matching the working weekly pipeline pattern."""
+    return {
+        "X-Api-Key": api_key,
+        "X-Api-Secret": api_secret,
+        "Content-Type": "application/json",
+    }
+
+
 def _create_link(
     api_key: str,
     api_secret: str,
@@ -83,22 +92,19 @@ def _create_link(
     """Create a new geni.us short URL via the GeniusLink API.
 
     POST /v3/shorturls
+    Auth via X-Api-Key/X-Api-Secret headers, URL as query param.
     Retries once with exponential backoff on 429/5xx.
     """
     url = "https://api.geni.us/v3/shorturls"
-    headers = {
-        "Content-Type": "application/json",
-    }
-    payload = {
-        "apiKey": api_key,
-        "apiSecret": api_secret,
-        "destinationUrl": amazon_url,
-        "groupId": group_id,
-    }
 
     for attempt in range(2):
         try:
-            resp = requests.post(url, json=payload, headers=headers, timeout=30)
+            resp = requests.post(
+                url,
+                params={"url": amazon_url, "groupId": group_id},
+                headers=_auth_headers(api_key, api_secret),
+                timeout=30,
+            )
 
             if resp.status_code == 429:
                 wait = 30 * (attempt + 1)
@@ -146,30 +152,22 @@ def _set_utm_tags(
     """
     url = "https://api.geni.us/v2/postprocessingrules"
     payload = {
-        "apiKey": api_key,
-        "apiSecret": api_secret,
+        "postProcessingLevel": "group",
         "groupId": group_id,
-        "rules": [
-            {
-                "type": "AppendQueryString",
-                "parameter": "utm_source",
-                "value": "sportsandnaturegear",
-            },
-            {
-                "type": "AppendQueryString",
-                "parameter": "utm_medium",
-                "value": "affiliate",
-            },
-            {
-                "type": "AppendQueryString",
-                "parameter": "utm_campaign",
-                "value": "softball",
-            },
-        ],
+        "parameterKeyValues": {
+            "utm_source": "sportsandnaturegear",
+            "utm_medium": "affiliate",
+            "utm_campaign": "softball",
+        },
     }
 
     try:
-        resp = requests.post(url, json=payload, timeout=30)
+        resp = requests.post(
+            url,
+            headers=_auth_headers(api_key, api_secret),
+            json=payload,
+            timeout=30,
+        )
         if resp.status_code < 400:
             logger.info("UTM tags set for group %d", group_id)
         else:
