@@ -259,7 +259,7 @@ def _call_anthropic(prompt: str) -> str:
     try:
         response = client.messages.create(
             model=MODEL_ID,
-            max_tokens=8192,
+            max_tokens=16384,
             messages=[{"role": "user", "content": prompt}],
         )
         return response.content[0].text.strip()
@@ -294,7 +294,7 @@ Return ONLY the JSON, no other text."""
     try:
         response = client.messages.create(
             model=MODEL_ID,
-            max_tokens=8192,
+            max_tokens=16384,
             messages=[{"role": "user", "content": correction_prompt}],
         )
         return response.content[0].text.strip()
@@ -396,19 +396,19 @@ def generate(
 
     # First attempt
     response_text = _call_anthropic(prompt)
-    data = _parse_response(response_text)
 
     try:
-        content = SoftballArticleContent(**data)
-    except ValidationError as e:
-        logger.warning("LLM output validation failed: %s. Retrying with correction.", e)
-        response_text = _call_anthropic_with_correction(response_text, str(e), config)
         data = _parse_response(response_text)
+        content = SoftballArticleContent(**data)
+    except (ContentGeneratorError, ValidationError) as e:
+        logger.warning("LLM output failed (attempt 1): %s. Retrying with correction.", e)
+        response_text = _call_anthropic_with_correction(response_text, str(e), config)
         try:
+            data = _parse_response(response_text)
             content = SoftballArticleContent(**data)
-        except ValidationError as e2:
+        except (ContentGeneratorError, ValidationError) as e2:
             raise ContentGeneratorError(
-                f"LLM output failed validation after correction: {e2}"
+                f"LLM output failed after correction retry: {e2}"
             ) from e2
 
     # Validate brand/model integrity
