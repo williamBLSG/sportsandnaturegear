@@ -239,6 +239,14 @@ CRITICAL RULES:
 9. Generate exactly 3 BlueSky posts.
 10. Generate one Pinterest pin per product.
 
+JSON FORMATTING — THIS IS CRITICAL:
+- All HTML in widget fields MUST use single quotes for HTML attributes (e.g., <a href='https://...'> NOT <a href="https://...">).
+  This prevents double quotes inside JSON strings from breaking the JSON structure.
+- Use \\n for newlines inside JSON strings, never raw newlines.
+- Escape any double quotes inside string values with a backslash: \\"
+- The output must be valid, parseable JSON. If in doubt, use simpler HTML with fewer attributes.
+- Do NOT wrap the output in markdown code blocks — return raw JSON only.
+
 Return ONLY the JSON object, no other text or markdown formatting."""
 
     return prompt
@@ -303,22 +311,43 @@ Return ONLY the JSON, no other text."""
 
 
 def _parse_response(response_text: str) -> dict:
-    """Parse the LLM response, handling markdown code blocks."""
+    """Parse the LLM response, handling markdown code blocks and common issues."""
     text = response_text.strip()
 
     # Remove markdown code blocks
     if text.startswith("```"):
         lines = text.split("\n")
-        # Remove first and last ``` lines
         if lines[0].strip().startswith("```"):
             lines = lines[1:]
         if lines and lines[-1].strip() == "```":
             lines = lines[:-1]
         text = "\n".join(lines)
 
+    # Attempt 1: try direct parse
     try:
         return json.loads(text)
+    except json.JSONDecodeError:
+        pass
+
+    # Attempt 2: try to extract JSON object from surrounding text
+    # (LLM sometimes adds explanation before/after)
+    brace_start = text.find("{")
+    brace_end = text.rfind("}")
+    if brace_start >= 0 and brace_end > brace_start:
+        extracted = text[brace_start:brace_end + 1]
+        try:
+            return json.loads(extracted)
+        except json.JSONDecodeError:
+            pass
+
+    # Attempt 3: try fixing control characters in strings
+    try:
+        # Replace literal tabs and other control chars that break JSON
+        cleaned = text.replace("\t", "\\t")
+        return json.loads(cleaned)
     except json.JSONDecodeError as e:
+        # Log first 500 chars for debugging
+        logger.error("JSON parse failed. First 500 chars: %s", text[:500])
         raise ContentGeneratorError(f"LLM returned invalid JSON: {e}") from e
 
 
