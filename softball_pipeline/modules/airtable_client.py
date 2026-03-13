@@ -217,7 +217,7 @@ def _upsert_faqs(
 ) -> int:
     """Upsert FAQ rows in softball-faq table.
 
-    Keyed by faq_id (article_id + sort_order).
+    Keyed by article_id + sort_order (faq_id is a computed field in Airtable).
     FAQs are PLAIN TEXT only — no HTML tags.
     Deletes stale FAQs from previous runs first.
     """
@@ -225,38 +225,34 @@ def _upsert_faqs(
 
     # Find existing FAQs for this article
     existing = table.all(formula=f"{{article_id}}='{config.article_id}'")
-    existing_by_faq_id = {r["fields"].get("faq_id"): r["id"] for r in existing}
+    existing_by_sort_order = {
+        r["fields"].get("sort_order"): r["id"] for r in existing
+    }
 
-    # Current FAQ IDs
-    current_faq_ids = set()
-    for faq in content.faqs:
-        faq_id = f"{config.article_id}-faq-{faq.sort_order}"
-        current_faq_ids.add(faq_id)
+    # Current sort orders
+    current_sort_orders = {faq.sort_order for faq in content.faqs}
 
-    # Delete stale FAQs
+    # Delete stale FAQs (sort orders no longer in current run)
     stale_ids = [
-        rec_id for faq_id, rec_id in existing_by_faq_id.items()
-        if faq_id not in current_faq_ids
+        rec_id for sort_order, rec_id in existing_by_sort_order.items()
+        if sort_order not in current_sort_orders
     ]
     if stale_ids:
         table.batch_delete(stale_ids)
         logger.info("Deleted %d stale FAQs for %s", len(stale_ids), config.article_id)
 
-    # Upsert current FAQs
+    # Upsert current FAQs — faq_id is computed by Airtable, do not write it
     written = 0
     for faq in content.faqs:
-        faq_id = f"{config.article_id}-faq-{faq.sort_order}"
-
         fields = {
-            "faq_id": faq_id,
             "article_id": config.article_id,
             "question": faq.question,
             "answer": faq.answer,  # PLAIN TEXT — no HTML
             "sort_order": faq.sort_order,
         }
 
-        if faq_id in existing_by_faq_id:
-            table.update(existing_by_faq_id[faq_id], fields)
+        if faq.sort_order in existing_by_sort_order:
+            table.update(existing_by_sort_order[faq.sort_order], fields)
         else:
             table.create(fields)
         written += 1
