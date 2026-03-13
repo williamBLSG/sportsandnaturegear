@@ -10,6 +10,7 @@ from __future__ import annotations
 import json
 import logging
 import os
+import time
 from datetime import datetime, timezone
 
 from softball_pipeline.models import (
@@ -21,74 +22,121 @@ from softball_pipeline.models import (
 
 logger = logging.getLogger(__name__)
 
+MAX_RETRIES = 3
+BACKOFF_BASE = 2  # seconds
+
 
 class SignalsCollectorError(Exception):
     pass
 
 
-def _extract_product(item: dict) -> SoftballRawProduct | None:
+def _retry(fn, retries=MAX_RETRIES, should_retry=lambda e: True):
+    """Retry a function with exponential backoff on transient errors."""
+    for attempt in range(retries):
+        try:
+            return fn()
+        except Exception as e:
+            if attempt < retries - 1 and should_retry(e):
+                wait = BACKOFF_BASE * (2 ** attempt)
+                logger.warning("Attempt %d failed: %s. Retrying in %ds...", attempt + 1, e, wait)
+                time.sleep(wait)
+            else:
+                raise
+
+
+def _is_rate_limit_error(e: Exception) -> bool:
+    """Check if an exception is a rate limit / throttling error."""
+    msg = str(e).lower()
+    return "rate limit" in msg or "throttl" in msg
+
+
+def _get_api_client(config: SoftballArticleConfig):
+    """Build an AmazonCreatorsApi client from env vars + config."""
+    from amazon_creatorsapi import AmazonCreatorsApi, Country
+
+    access_key = os.environ.get("AMZ_CREATORS_ACCESS_KEY")
+    secret_key = os.environ.get("AMZ_CREATORS_SECRET_KEY")
+
+    if not access_key or not secret_key:
+        raise SignalsCollectorError(
+            "AMZ_CREATORS_ACCESS_KEY and AMZ_CREATORS_SECRET_KEY must be set"
+        )
+
+    return AmazonCreatorsApi(
+        credential_id=access_key,
+        credential_secret=secret_key,
+        version="2.1",
+        tag=config.assoc_tag,
+        country=Country.US,
+        throttling=1,
+    )
+
+
+def _extract_product(item) -> SoftballRawProduct | None:
     """Extract a SoftballRawProduct from an Amazon Creators API result item.
 
+    The SDK returns objects with attribute access, not dicts.
     Returns None if the item is missing critical data (ASIN or title).
     """
-    asin = item.get("asin")
-    title = item.get("title")
+    try:
+        asin = item.asin
+        if not asin:
+            return None
 
-    if not asin or not title:
+        # Title
+        title = None
+        if item.item_info and item.item_info.title:
+            title = item.item_info.title.display_value
+        if not title:
+            return None
+
+        # Brand
+        brand = None
+        if item.item_info and item.item_info.by_line_info and item.item_info.by_line_info.brand:
+            brand = item.item_info.by_line_info.brand.display_value
+
+        # BSR (best sellers rank)
+        bsr = None
+        if item.browse_node_info and item.browse_node_info.website_sales_rank:
+            bsr = item.browse_node_info.website_sales_rank.sales_rank
+
+        # Reviews
+        review_count = None
+        rating = None
+        if item.customer_reviews:
+            review_count = item.customer_reviews.count
+            if item.customer_reviews.star_rating:
+                rating = item.customer_reviews.star_rating.value
+
+        # Price
+        price_usd = None
+        if item.offers_v2 and item.offers_v2.listings:
+            listing = item.offers_v2.listings[0]
+            if listing.price and listing.price.money:
+                price_usd = listing.price.money.amount
+
+        # Image
+        image_url = None
+        if item.images and item.images.primary and item.images.primary.large:
+            image_url = item.images.primary.large.url
+
+        # Detail page URL
+        detail_page_url = item.detail_page_url
+
+        return SoftballRawProduct(
+            asin=asin,
+            title=title,
+            brand=brand,
+            bsr=bsr,
+            review_count=review_count,
+            rating=rating,
+            price_usd=price_usd,
+            image_url=image_url,
+            detail_page_url=detail_page_url,
+        )
+    except Exception as e:
+        logger.warning("Failed to extract product from item %s: %s", getattr(item, "asin", "?"), e)
         return None
-
-    # Extract BSR from salesRankings
-    bsr = None
-    rankings = item.get("salesRankings", [])
-    if rankings:
-        # Prefer the first ranking (most specific category)
-        bsr = rankings[0].get("rank")
-
-    # Extract price
-    price_usd = None
-    price_info = item.get("price", {})
-    if price_info:
-        amount = price_info.get("amount")
-        if amount is not None:
-            price_usd = float(amount)
-
-    # Extract rating and review count
-    rating = None
-    review_count = None
-    customer_reviews = item.get("customerReviews", {})
-    if customer_reviews:
-        rating = customer_reviews.get("starRating")
-        review_count = customer_reviews.get("count")
-
-    # Extract images
-    image_url = None
-    images = item.get("images", [])
-    if images:
-        # Prefer "large" or first available
-        for img in images:
-            if img.get("size") == "large":
-                image_url = img.get("url")
-                break
-        if not image_url and images:
-            image_url = images[0].get("url")
-
-    # Extract detail page URL
-    detail_page_url = item.get("detailPageUrl")
-
-    # Extract brand
-    brand = item.get("brand")
-
-    return SoftballRawProduct(
-        asin=asin,
-        title=title,
-        brand=brand,
-        bsr=bsr,
-        review_count=review_count,
-        rating=rating,
-        price_usd=price_usd,
-        image_url=image_url,
-        detail_page_url=detail_page_url,
-    )
 
 
 def _fetch_products(
@@ -97,55 +145,64 @@ def _fetch_products(
 ) -> list[SoftballRawProduct]:
     """Fetch products from Amazon Creators API with pagination.
 
-    Uses SearchIndex (SportingGoods) and keyword search.
+    Uses SearchIndex (SportingGoods) and keyword search via the SDK's
+    search_items() method with proper enum-based resources.
     No browse_node_id or gender filter for softball.
     """
+    from amazon_creatorsapi.models import SearchItemsResource, SortBy
+
+    resources = [
+        SearchItemsResource.ITEM_INFO_DOT_TITLE,
+        SearchItemsResource.ITEM_INFO_DOT_BY_LINE_INFO,
+        SearchItemsResource.BROWSE_NODE_INFO_DOT_WEBSITE_SALES_RANK,
+        SearchItemsResource.CUSTOMER_REVIEWS_DOT_COUNT,
+        SearchItemsResource.CUSTOMER_REVIEWS_DOT_STAR_RATING,
+        SearchItemsResource.OFFERS_V2_DOT_LISTINGS_DOT_PRICE,
+        SearchItemsResource.IMAGES_DOT_PRIMARY_DOT_LARGE,
+    ]
+
     all_products: list[SoftballRawProduct] = []
     seen_asins: set[str] = set()
 
-    for page in range(1, 3):  # 2 pages max
+    for page in range(1, 3):  # Pages 1 and 2
+        if page > 1:
+            time.sleep(1)  # Amazon Creators API rate limit: 1 req/sec
+        logger.info("Fetching page %d for '%s'", page, config.keywords)
         try:
-            # Build search params
-            params = {
-                "Keywords": config.keywords,
-                "SearchIndex": config.search_index,
-                "ItemCount": 10,
-                "ItemPage": page,
-                "Resources": [
-                    "ItemInfo.Title",
-                    "ItemInfo.ByLineInfo",
-                    "BrowseNodeInfo.BrowseNodes",
-                    "Offers.Listings.Price",
-                    "CustomerReviews.StarRating",
-                    "CustomerReviews.Count",
-                    "Images.Primary.Large",
-                    "Images.Primary.Medium",
-                    "BrowseNodeInfo.BrowseNodes.SalesRank",
-                ],
-            }
-
-            result = api.search_products(**params)
-
-            items = result.get("items", [])
-            if not items:
-                logger.info("No more items on page %d", page)
-                break
-
-            for item in items:
-                product = _extract_product(item)
-                if product and product.asin not in seen_asins:
-                    all_products.append(product)
-                    seen_asins.add(product.asin)
-
-            logger.info("Page %d: fetched %d products", page, len(items))
-
+            search_kwargs = dict(
+                keywords=config.keywords,
+                search_index=config.search_index,
+                item_count=10,
+                item_page=page,
+                min_reviews_rating=int(config.min_rating),
+                sort_by=SortBy.FEATURED,
+                resources=resources,
+            )
+            if config.browse_node_id:
+                search_kwargs["browse_node_id"] = config.browse_node_id
+            result = _retry(
+                lambda: api.search_items(**search_kwargs),
+                should_retry=_is_rate_limit_error,
+            )
         except Exception as e:
-            logger.warning("Error fetching page %d: %s", page, e)
             if page == 1:
                 raise SignalsCollectorError(
                     f"Failed to fetch first page of products: {e}"
                 ) from e
+            logger.warning("Error fetching page %d: %s", page, e)
             break
+
+        if not result or not result.items:
+            logger.warning("No items returned for page %d", page)
+            continue
+
+        for item in result.items:
+            product = _extract_product(item)
+            if product and product.asin not in seen_asins:
+                seen_asins.add(product.asin)
+                all_products.append(product)
+
+        logger.info("Page %d: fetched %d items", page, len(result.items))
 
     return all_products
 
@@ -192,29 +249,7 @@ def collect(
         logger.info("Resuming from cached raw_signals.json")
         return SoftballRawSignals.model_validate_json(artifact_path.read_text())
 
-    # Import here to avoid import error when not installed
-    try:
-        from amazon_creatorsapi import AmazonCreatorsAPI
-    except ImportError:
-        raise SignalsCollectorError(
-            "amazon_creatorsapi package required. pip install amazon-creatorsapi"
-        )
-
-    access_key = os.environ.get("AMZ_CREATORS_ACCESS_KEY")
-    secret_key = os.environ.get("AMZ_CREATORS_SECRET_KEY")
-    assoc_tag = config.assoc_tag
-
-    if not access_key or not secret_key:
-        raise SignalsCollectorError(
-            "AMZ_CREATORS_ACCESS_KEY and AMZ_CREATORS_SECRET_KEY must be set"
-        )
-
-    api = AmazonCreatorsAPI(
-        access_key=access_key,
-        secret_key=secret_key,
-        partner_tag=assoc_tag,
-        country="US",
-    )
+    api = _get_api_client(config)
 
     # Primary search
     logger.info("Fetching products for '%s' (index: %s)", config.keywords, config.search_index)
@@ -224,12 +259,12 @@ def collect(
 
     # Supplemental brand searches for top brands
     if supplemental_keywords:
+        seen_asins = {p.asin for p in products}
         for kw in supplemental_keywords:
             logger.info("Supplemental search: '%s'", kw)
             supp_config = config.model_copy(update={"keywords": kw})
             try:
                 supp_products = _fetch_products(api, supp_config)
-                seen_asins = {p.asin for p in products}
                 for sp in supp_products:
                     if sp.asin not in seen_asins:
                         sp.source = "supplemental"
