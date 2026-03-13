@@ -107,7 +107,7 @@ def _upsert_article(
         "comparison_asins": content.comparison_asins,
         # Dates
         "build_date": run_date,
-        "last_refresh": now_iso,
+        "last_refresh": run_date,
     }
 
     # Upsert by article_id
@@ -377,10 +377,10 @@ def update_article_widget(
         return
 
     field_name = f"widget_{widget_number}"
-    now_iso = datetime.now(timezone.utc).isoformat()
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     table.update(existing[0]["id"], {
         field_name: html,
-        "last_refresh": now_iso,
+        "last_refresh": today,
     })
     logger.info("Updated %s for %s", field_name, config.article_id)
 
