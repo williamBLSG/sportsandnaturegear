@@ -178,7 +178,7 @@ def _fetch_products(
                 sort_by=SortBy.FEATURED,
                 resources=resources,
             )
-            if config.browse_node_id:
+            if getattr(config, "browse_node_id", None):
                 search_kwargs["browse_node_id"] = config.browse_node_id
             result = _retry(
                 lambda: api.search_items(**search_kwargs),
