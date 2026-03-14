@@ -281,6 +281,10 @@ class SoftballProductContent(BaseModel):
     best_for: str = ""
     editorial_blurb: str = ""  # 2-3 sentence product description
     standout_feature: str = ""
+    # Duda list widget fields (for Top Pick, Budget, Mid-Range, Premium)
+    list_title: str = ""  # e.g. "Top Pick: Easton Moxie"
+    list_description: str = ""  # Rich text (no HTML) — price, rating, editorial paragraph
+    list_cta_text: str = ""  # e.g. "Check price on Amazon"
 
 
 class SoftballFaqEntry(BaseModel):
@@ -295,35 +299,35 @@ class SoftballArticleContent(BaseModel):
     article_id: str
     category_id: str
 
-    # Widget 1: Page header / intro
-    widget_1: str  # HTML: h1, intro paragraphs, overview
+    # Widget 1: Intro paragraphs (NO H1 — Duda handles the H1 natively)
+    widget_1: str  # HTML blob: intro paragraphs only, no heading
 
     # Widget 2: "Why You Need This Gear" section
-    widget_2: str  # HTML
+    widget_2: str  # HTML blob
 
     # Widget 3: "Top Features to Look For" section
-    widget_3: str  # HTML
+    widget_3: str  # HTML blob
 
-    # Widget 4: Comparison table
-    widget_4: str  # HTML: product comparison table with all products
+    # Widget 4: Comparison table — "Our Top Picks at a Glance"
+    widget_4: str  # HTML blob: table with inline CSS
 
-    # Widget 5: Top Pick spotlight
-    widget_5: str  # HTML: detailed top pick card
+    # Widget 5: "Our Top Pick" styled card (green badge, blurb, CTA button)
+    widget_5: str  # HTML blob with inline CSS
 
-    # Widget 6: Budget Pick spotlight
-    widget_6: str  # HTML: detailed budget pick card
+    # Widget 6: "The Three Tiers" — budget / mid-range / premium side-by-side cards
+    widget_6: str  # HTML blob with inline CSS
 
-    # Widget 7: Mid-Range Pick spotlight
-    widget_7: str  # HTML: detailed mid-range pick card
+    # Widget 7: "How to Choose" buying guidance
+    widget_7: str  # HTML blob
 
-    # Widget 8: Premium Pick spotlight
-    widget_8: str  # HTML: detailed premium pick card
+    # Widget 8: Final thoughts + CTA
+    widget_8: str  # HTML blob
 
-    # Widget 9: "How to Choose" buying guidance
-    widget_9: str  # HTML
+    # Widget 9: Reserved / additional content
+    widget_9: str = ""  # HTML blob (optional)
 
-    # Widget 10: Final thoughts + CTA
-    widget_10: str  # HTML
+    # Widget 10: Reserved / additional content
+    widget_10: str = ""  # HTML blob (optional)
 
     # SEO fields
     meta_title: str

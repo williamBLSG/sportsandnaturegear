@@ -216,19 +216,27 @@ def run_price_check(article_id: str) -> None:
             if p.price_usd is not None:
                 new_prices[p.asin] = p.price_usd
 
-        # Role → widget number mapping
-        role_to_widget = {
-            "top_pick": 5,
-            "budget_pick": 6,
-            "midrange_pick": 7,
-            "premium_pick": 8,
+        # Role → widget mapping:
+        #   top_pick → widget 5 (Our Top Pick card)
+        #   budget_pick, midrange_pick, premium_pick → widget 6 (Three Tiers — one widget with all 3)
+        # Note: Airtable stores display names; map them back to pipeline values
+        AIRTABLE_ROLE_TO_PIPELINE = {
+            "Main Pick": "top_pick",
+            "Budget Pick": "budget_pick",
+            "Runner Up": "midrange_pick",
+            "Upgrade Pick": "premium_pick",
+            "Honorable Mention": "comparison",
+            "Other": "comparison",
         }
+        tier_widget_needs_regen = False  # Track if widget 6 needs regeneration
 
         # Check each product for price changes >10%
         for product in current_products:
             asin = product.get("asin")
             old_price = product.get("price_usd")
-            role = product.get("role", "")
+            # Map Airtable display role back to pipeline role
+            raw_role = product.get("role", "")
+            role = AIRTABLE_ROLE_TO_PIPELINE.get(raw_role, raw_role)
 
             if not asin or old_price is None:
                 continue
@@ -250,15 +258,12 @@ def run_price_check(article_id: str) -> None:
                 # Update price in products table
                 airtable_client.update_product_price(config, asin, new_price)
 
-                # Regenerate widget if this product has a spotlight slot
-                widget_num = role_to_widget.get(role)
-                if widget_num:
+                # Regenerate widget 5 if top_pick price changed
+                if role == "top_pick":
                     try:
-                        # Build a minimal linked product for widget regeneration
                         from softball_pipeline.models import SoftballLinkedProduct
                         linked = SoftballLinkedProduct(
-                            rank=0,
-                            asin=asin,
+                            rank=0, asin=asin,
                             title=product.get("brand", "") + " " + product.get("model", ""),
                             brand=product.get("brand", ""),
                             model=product.get("model", ""),
@@ -266,19 +271,65 @@ def run_price_check(article_id: str) -> None:
                             price_usd=new_price,
                             rating=product.get("rating"),
                             review_count=product.get("review_count"),
-                            composite_score=0.0,
-                            role=role,
+                            composite_score=0.0, role=role,
                             affiliate_url=product.get("affiliate_url", ""),
                         )
-
                         new_html = content_generator.regenerate_widget_for_price_change(
-                            linked, widget_num, config, old_price, new_price,
+                            linked, 5, config, old_price, new_price,
                         )
-                        airtable_client.update_article_widget(config, widget_num, new_html)
+                        airtable_client.update_article_widget(config, 5, new_html)
                         run_log.widgets_regenerated += 1
                     except ContentGeneratorError as e:
-                        logger.warning("Widget regeneration failed for %s: %s", asin, e)
-                        run_log.warnings.append(f"Widget regen failed for {asin}: {e}")
+                        logger.warning("Widget 5 regeneration failed for %s: %s", asin, e)
+                        run_log.warnings.append(f"Widget 5 regen failed for {asin}: {e}")
+
+                # Flag widget 6 for regeneration if any tier product price changed
+                if role in ("budget_pick", "midrange_pick", "premium_pick"):
+                    tier_widget_needs_regen = True
+
+        # Regenerate widget 6 (Three Tiers) once if any tier price changed
+        if tier_widget_needs_regen:
+            try:
+                from softball_pipeline.models import SoftballLinkedProduct
+                tier_roles = ("budget_pick", "midrange_pick", "premium_pick")
+                all_tier_products = []
+                trigger_product = None
+                trigger_old_price = 0.0
+                trigger_new_price = 0.0
+                for prod in current_products:
+                    r = AIRTABLE_ROLE_TO_PIPELINE.get(prod.get("role", ""), prod.get("role", ""))
+                    if r in tier_roles:
+                        # Use updated price if available, else current
+                        p_price = new_prices.get(prod["asin"], prod.get("price_usd", 0))
+                        linked = SoftballLinkedProduct(
+                            rank=0, asin=prod["asin"],
+                            title=prod.get("brand", "") + " " + prod.get("model", ""),
+                            brand=prod.get("brand", ""),
+                            model=prod.get("model", ""),
+                            full_name=prod.get("brand", "") + " " + prod.get("model", ""),
+                            price_usd=p_price,
+                            rating=prod.get("rating"),
+                            review_count=prod.get("review_count"),
+                            composite_score=0.0, role=r,
+                            affiliate_url=prod.get("affiliate_url", ""),
+                        )
+                        all_tier_products.append(linked)
+                        if trigger_product is None:
+                            trigger_product = linked
+                            trigger_old_price = prod.get("price_usd", 0)
+                            trigger_new_price = p_price
+
+                if trigger_product and all_tier_products:
+                    new_html = content_generator.regenerate_widget_for_price_change(
+                        trigger_product, 6, config,
+                        trigger_old_price, trigger_new_price,
+                        all_tier_products=all_tier_products,
+                    )
+                    airtable_client.update_article_widget(config, 6, new_html)
+                    run_log.widgets_regenerated += 1
+            except ContentGeneratorError as e:
+                logger.warning("Widget 6 (Three Tiers) regeneration failed: %s", e)
+                run_log.warnings.append(f"Widget 6 regen failed: {e}")
 
         run_log.status = "success"
         run_log.run_completed_at = datetime.now(timezone.utc)

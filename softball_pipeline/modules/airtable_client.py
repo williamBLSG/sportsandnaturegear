@@ -18,7 +18,7 @@ Airtable schema (field names from existing base):
   softball-products (tbl1CmZmPHhLSF9Pk):
     product_id, article_id, asin, role, brand, model, price_usd, rating,
     review_count, bsr, image_url, affiliate_url, best_for, standout_feature,
-    editorial_blurb, last_updated
+    editorial_blurb, list_title, list_description, list_cta_text, last_updated
 
   softball-faq (tblFIRrFz1SKCxVeU):
     faq_id, article_id, question, answer, sort_order
@@ -193,6 +193,9 @@ def _upsert_products(
             "best_for": product.best_for,
             "standout_feature": product.standout_feature,
             "editorial_blurb": product.editorial_blurb,
+            "list_title": product.list_title,
+            "list_description": product.list_description,
+            "list_cta_text": product.list_cta_text,
             "last_updated": today,
         }
 
