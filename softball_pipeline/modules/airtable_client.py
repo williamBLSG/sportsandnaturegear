@@ -10,7 +10,7 @@ All writes are upserts keyed by article_id (articles) or composite keys
 
 Airtable schema (field names from existing base):
   softball-articles (tbl4p48LV1YDJ7teu):
-    article_id, category_id, slug, page_title, meta_title, meta_description,
+    article_id, category_id, slug, page_title, nav_title, meta_title, meta_description,
     primary_keyword, secondary_keywords, target_word_count_min, target_word_count_max,
     editorial_notes, widget_1..widget_10, top_pick_asin, budget_asin, midrange_asin,
     premium_asin, comparison_asins, build_date, last_refresh, published_url
@@ -104,6 +104,7 @@ def _upsert_article(
         "target_word_count_min": config.target_word_count_min,
         "target_word_count_max": config.target_word_count_max,
         "editorial_notes": config.editorial_notes,
+        "nav_title": config.display_name,
         # 10 HTML widget slots
         "widget_1": content.widget_1,
         "widget_2": content.widget_2,
