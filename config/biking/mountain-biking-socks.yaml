@@ -10,9 +10,9 @@ site_url: "https://www.sportsandnaturegear.com"
 # ── Amazon Creators API ─────────────────────────────────────────
 search_index: SportsAndOutdoors
 keywords: "mountain biking socks"
-min_reviews: 10
+min_reviews: 5
 min_rating: 2.5
-price_min_usd: 12
+price_min_usd: 5
 price_max_usd: 38
 product_count_target: 7
 

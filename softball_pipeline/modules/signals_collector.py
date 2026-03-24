@@ -217,17 +217,44 @@ def _apply_filters(
         # Price filter (skip if no price data)
         if p.price_usd is not None:
             if p.price_usd < config.price_min_usd or p.price_usd > config.price_max_usd:
+                logger.debug(
+                    "Filtered %s (%s): price $%.2f outside $%d-$%d",
+                    p.asin, p.title[:40], p.price_usd, config.price_min_usd, config.price_max_usd,
+                )
                 continue
 
         # Review count filter (skip if no review data — Creators API limitation)
         if p.review_count is not None and p.review_count < config.min_reviews:
+            logger.debug(
+                "Filtered %s (%s): %d reviews < %d minimum",
+                p.asin, p.title[:40], p.review_count, config.min_reviews,
+            )
             continue
 
         # Rating filter (skip if no rating data)
         if p.rating is not None and p.rating < config.min_rating:
+            logger.debug(
+                "Filtered %s (%s): %.1f rating < %.1f minimum",
+                p.asin, p.title[:40], p.rating, config.min_rating,
+            )
             continue
 
         filtered.append(p)
+
+    if not filtered:
+        logger.warning(
+            "All %d products filtered out. Filter criteria: price $%d-$%d, min_reviews=%d, min_rating=%.1f",
+            len(products), config.price_min_usd, config.price_max_usd,
+            config.min_reviews, config.min_rating,
+        )
+        for p in products[:5]:
+            logger.warning(
+                "  Sample: %s | price=%s | reviews=%s | rating=%s",
+                p.title[:50],
+                f"${p.price_usd:.2f}" if p.price_usd else "None",
+                p.review_count if p.review_count is not None else "None",
+                p.rating if p.rating is not None else "None",
+            )
 
     return filtered
 

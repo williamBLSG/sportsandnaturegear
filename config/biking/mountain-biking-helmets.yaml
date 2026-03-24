@@ -10,9 +10,9 @@ site_url: "https://www.sportsandnaturegear.com"
 # ── Amazon Creators API ─────────────────────────────────────────
 search_index: SportsAndOutdoors
 keywords: "mountain biking helmets"
-min_reviews: 10
+min_reviews: 5
 min_rating: 2.5
-price_min_usd: 50
+price_min_usd: 30
 price_max_usd: 250
 product_count_target: 8
 
