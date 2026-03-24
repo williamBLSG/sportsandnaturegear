@@ -1,0 +1,63 @@
+BIKING PIPELINE MIGRATION — COMPLETED
+======================================
+Date: 2026-03-24
+Source: softball_pipeline/
+Target: biking_pipeline/
+
+CHANGES APPLIED:
+================
+
+1. Directory Structure
+   ✓ Copied entire softball_pipeline/ → biking_pipeline/
+   ✓ All 11 Python modules replicated with proper structure
+
+2. Code Replacements (via sed)
+   ✓ softball_pipeline → biking_pipeline (import paths, 100% coverage)
+   ✓ Softball → Biking (class names: SoftballArticleConfig → BikingArticleConfig, etc.)
+   ✓ softball → biking (strings, paths, comments, configuration references)
+
+3. Class Renamings (verified)
+   ✓ BikingArticleConfig
+   ✓ BikingRawProduct
+   ✓ BikingRawSignals
+   ✓ BikingTrendsQuery
+   ✓ BikingTrendsData
+   ✓ BikingRunLog (and all related)
+   ✓ biking_runs_path() function
+   ✓ biking_cache_path() function
+
+4. Path and Configuration References
+   ✓ runs/biking/ (artifact directory paths)
+   ✓ config/biking/ (configuration directory)
+   ✓ biking-articles (Airtable table reference)
+   ✓ biking-products (Airtable table reference)
+   ✓ biking-faq (Airtable table reference)
+
+5. Hashtag Updates
+   ✓ #Biking (verified in content_generator.py)
+   ✓ #BikingGear (verified in content_generator.py)
+
+6. Environment Variable Handling
+   ✓ AIRTABLE_SOFTBALL_BASE_ID retained (shared base with biking pipeline)
+   ✓ config_loader.py correctly resolves ${AIRTABLE_SOFTBALL_BASE_ID} from YAML
+
+7. Syntax Validation
+   ✓ All 11 Python files pass ast.parse() validation
+   ✓ Import statements correctly reference biking_pipeline modules
+   ✓ No circular imports or broken references
+
+FILES MODIFIED:
+===============
+biking_pipeline/__init__.py
+biking_pipeline/models.py
+biking_pipeline/run.py
+biking_pipeline/modules/__init__.py
+biking_pipeline/modules/config_loader.py
+biking_pipeline/modules/signals_collector.py
+biking_pipeline/modules/trends_collector.py
+biking_pipeline/modules/ranker.py
+biking_pipeline/modules/geniuslink_client.py
+biking_pipeline/modules/content_generator.py
+biking_pipeline/modules/airtable_client.py
+
+STATUS: ✓ COMPLETE AND VERIFIED
