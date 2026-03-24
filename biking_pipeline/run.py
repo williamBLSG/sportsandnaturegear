@@ -60,6 +60,64 @@ def _save_run_log(run_log: BikingRunLog, run_date: str) -> None:
 
 
 # ---------------------------------------------------------------------------
+# Auto-pick: select the article with the oldest (or missing) last_refresh
+# ---------------------------------------------------------------------------
+
+def auto_pick_article() -> str:
+    """Pick the next article to build based on staleness.
+
+    Queries Airtable for each article's last_refresh date and picks the one
+    that is oldest or has never been built. This ensures round-robin coverage
+    across all articles on scheduled runs.
+
+    Falls back to alphabetical first article if Airtable is unreachable.
+    """
+    import os
+    from pyairtable import Api
+
+    article_ids = config_loader.list_article_ids()
+    if not article_ids:
+        raise SystemExit("No biking config files found in config/biking/")
+
+    token = os.environ.get("AIRTABLE_ACCESS_TOKEN")
+    base_id = os.environ.get("AIRTABLE_SOFTBALL_BASE_ID")
+
+    if not token or not base_id:
+        logger.warning("Airtable credentials not set — falling back to first article: %s", article_ids[0])
+        return article_ids[0]
+
+    try:
+        api = Api(token)
+        table = api.table(base_id, "biking-articles")
+        rows = table.all(fields=["article_id", "last_refresh"])
+
+        # Build map: article_id → last_refresh date string (or None)
+        refresh_dates: dict[str, str | None] = {aid: None for aid in article_ids}
+        for row in rows:
+            fields = row.get("fields", {})
+            aid = fields.get("article_id", "")
+            if aid in refresh_dates:
+                refresh_dates[aid] = fields.get("last_refresh")
+
+        # Sort: None (never built) first, then oldest date
+        def sort_key(item: tuple[str, str | None]) -> tuple[int, str]:
+            aid, dt = item
+            if dt is None:
+                return (0, aid)  # Never built — highest priority
+            return (1, dt)  # Oldest date first
+
+        sorted_articles = sorted(refresh_dates.items(), key=sort_key)
+        picked = sorted_articles[0][0]
+        last = sorted_articles[0][1] or "never"
+        logger.info("Auto-picked article: %s (last refresh: %s)", picked, last)
+        return picked
+
+    except Exception as e:
+        logger.warning("Auto-pick Airtable query failed (%s) — falling back to first article: %s", e, article_ids[0])
+        return article_ids[0]
+
+
+# ---------------------------------------------------------------------------
 # Daily Build / Manual Refresh
 # ---------------------------------------------------------------------------
 
@@ -386,17 +444,12 @@ def main():
 
     args = parser.parse_args()
 
-    # If no article specified, list available articles
+    # If no article specified, auto-pick the stalest one
     if args.article is None:
-        article_ids = config_loader.list_article_ids()
-        if not article_ids:
-            logger.error("No biking config files found in config/biking/")
-            sys.exit(1)
-        logger.info("Available articles: %s", ", ".join(article_ids))
-        logger.error("Please specify --article")
-        sys.exit(1)
-
-    article_id = args.article
+        logger.info("No --article specified, auto-picking...")
+        article_id = auto_pick_article()
+    else:
+        article_id = args.article
 
     if args.type == "price_check":
         run_price_check(article_id)

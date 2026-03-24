@@ -56,27 +56,18 @@ jobs:
           restore-keys: |
             geniuslink-biking-
 
-      - name: Determine article ID
-        id: article
-        run: |
-          if [ -n "${{ inputs.article_id }}" ]; then
-            echo "article_id=${{ inputs.article_id }}" >> $GITHUB_OUTPUT
-          else
-            # Auto-pick: use the article list from config
-            # In production, this would query Airtable for the next "Queue" article
-            # For now, we require an article_id via workflow_dispatch
-            echo "::error::No article_id specified. Use workflow_dispatch with an article_id."
-            exit 1
-          fi
-
       - name: Run daily build
         run: |
           FORCE_FLAG=""
           if [ "${{ inputs.force }}" = "true" ]; then
             FORCE_FLAG="--force"
           fi
+          ARTICLE_FLAG=""
+          if [ -n "${{ inputs.article_id }}" ]; then
+            ARTICLE_FLAG="--article ${{ inputs.article_id }}"
+          fi
           python -m biking_pipeline.run \
-            --article ${{ steps.article.outputs.article_id }} \
+            $ARTICLE_FLAG \
             --type daily_build \
             $FORCE_FLAG
 
@@ -84,6 +75,6 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: biking-run-${{ steps.article.outputs.article_id }}-${{ github.run_id }}
-          path: runs/biking/${{ steps.article.outputs.article_id }}/
+          name: biking-run-${{ github.run_id }}
+          path: runs/biking/
           retention-days: 30
