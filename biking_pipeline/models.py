@@ -302,20 +302,20 @@ class BikingArticleContent(BaseModel):
     # Widget 1: Intro paragraphs (NO H1 — Duda handles the H1 natively)
     widget_1: str  # HTML blob: intro paragraphs only, no heading
 
-    # Widget 2: "Why You Need This Gear" section
-    widget_2: str  # HTML blob
+    # Widget 2: "Our Top Pick" styled card (green badge, inline CSS)
+    widget_2: str  # HTML blob with inline CSS
 
-    # Widget 3: "Top Features to Look For" section
+    # Widget 3: "Why You Need This Gear" section
     widget_3: str  # HTML blob
 
-    # Widget 4: Comparison table — "Our Top Picks at a Glance"
-    widget_4: str  # HTML blob: table with inline CSS
+    # Widget 4: "The Three Tiers" — budget / mid-range / premium side-by-side cards
+    widget_4: str  # HTML blob with inline CSS
 
-    # Widget 5: "Our Top Pick" styled card (green badge, blurb, CTA button)
-    widget_5: str  # HTML blob with inline CSS
+    # Widget 5: "Top Features to Look For" section
+    widget_5: str  # HTML blob
 
-    # Widget 6: "The Three Tiers" — budget / mid-range / premium side-by-side cards
-    widget_6: str  # HTML blob with inline CSS
+    # Widget 6: Comparison table — "Our Top Picks at a Glance"
+    widget_6: str  # HTML blob: table with inline CSS
 
     # Widget 7: "How to Choose" buying guidance
     widget_7: str  # HTML blob

@@ -217,8 +217,8 @@ def run_price_check(article_id: str) -> None:
                 new_prices[p.asin] = p.price_usd
 
         # Role → widget mapping:
-        #   top_pick → widget 5 (Our Top Pick card)
-        #   budget_pick, midrange_pick, premium_pick → widget 6 (Three Tiers — one widget with all 3)
+        #   top_pick → widget 2 (Our Top Pick card)
+        #   budget_pick, midrange_pick, premium_pick → widget 4 (Three Tiers — one widget with all 3)
         # Note: Airtable stores display names; map them back to pipeline values
         AIRTABLE_ROLE_TO_PIPELINE = {
             "Main Pick": "top_pick",
@@ -258,7 +258,7 @@ def run_price_check(article_id: str) -> None:
                 # Update price in products table
                 airtable_client.update_product_price(config, asin, new_price)
 
-                # Regenerate widget 5 if top_pick price changed
+                # Regenerate widget 2 if top_pick price changed
                 if role == "top_pick":
                     try:
                         from softball_pipeline.models import SoftballLinkedProduct
@@ -275,19 +275,19 @@ def run_price_check(article_id: str) -> None:
                             affiliate_url=product.get("affiliate_url", ""),
                         )
                         new_html = content_generator.regenerate_widget_for_price_change(
-                            linked, 5, config, old_price, new_price,
+                            linked, 2, config, old_price, new_price,
                         )
-                        airtable_client.update_article_widget(config, 5, new_html)
+                        airtable_client.update_article_widget(config, 2, new_html)
                         run_log.widgets_regenerated += 1
                     except ContentGeneratorError as e:
-                        logger.warning("Widget 5 regeneration failed for %s: %s", asin, e)
-                        run_log.warnings.append(f"Widget 5 regen failed for {asin}: {e}")
+                        logger.warning("Widget 2 regeneration failed for %s: %s", asin, e)
+                        run_log.warnings.append(f"Widget 2 regen failed for {asin}: {e}")
 
                 # Flag widget 6 for regeneration if any tier product price changed
                 if role in ("budget_pick", "midrange_pick", "premium_pick"):
                     tier_widget_needs_regen = True
 
-        # Regenerate widget 6 (Three Tiers) once if any tier price changed
+        # Regenerate widget 4 (Three Tiers) once if any tier price changed
         if tier_widget_needs_regen:
             try:
                 from softball_pipeline.models import SoftballLinkedProduct
@@ -321,15 +321,15 @@ def run_price_check(article_id: str) -> None:
 
                 if trigger_product and all_tier_products:
                     new_html = content_generator.regenerate_widget_for_price_change(
-                        trigger_product, 6, config,
+                        trigger_product, 4, config,
                         trigger_old_price, trigger_new_price,
                         all_tier_products=all_tier_products,
                     )
-                    airtable_client.update_article_widget(config, 6, new_html)
+                    airtable_client.update_article_widget(config, 4, new_html)
                     run_log.widgets_regenerated += 1
             except ContentGeneratorError as e:
-                logger.warning("Widget 6 (Three Tiers) regeneration failed: %s", e)
-                run_log.warnings.append(f"Widget 6 regen failed: {e}")
+                logger.warning("Widget 4 (Three Tiers) regeneration failed: %s", e)
+                run_log.warnings.append(f"Widget 4 regen failed: {e}")
 
         run_log.status = "success"
         run_log.run_completed_at = datetime.now(timezone.utc)

@@ -175,31 +175,31 @@ FAQ answers must be PLAIN TEXT ONLY (no HTML tags whatsoever).
     who it's for, and how products were selected. Mention rankings are based on sales data, buyer ratings,
     and search trends. Be welcoming to beginners. Start with <p>, not <h1>.",
 
-  "widget_2": "<HTML BLOB> 'Why You Need This Gear' section. <h2> heading. 2-3 paragraphs explaining
-    why this gear matters, common use cases, and what beginners should know. Relatable scenarios.",
-
-  "widget_3": "<HTML BLOB> 'Top Features to Look For' section. <h2> heading. Break down the most
-    important features/specs for this category. Explain each in plain English. Use <h3> for each
-    feature. Include how each feature affects the buying decision.",
-
-  "widget_4": "<HTML BLOB> Comparison table. <h2> heading 'Our Top Picks at a Glance'.
-    Create an HTML <table> with inline CSS styling for readability. Columns: Rank, Product, Price, Rating, Best For.
-    Each product name should be an <a> linking to its affiliate_url.
-    Include all {len(products)} products.
-    Table styling: use inline styles for borders, padding, alternating row colors, header background.
-    Example structure: <h2 style='color:#c17328;font-family:sans-serif;'>Our Top Picks at a Glance</h2><table style='width:100%;border-collapse:collapse;font-family:sans-serif;'><thead><tr style='background:#f5f5f5;'><th style='padding:10px;text-align:left;border-bottom:2px solid #ddd;'>Rank</th>...</tr></thead><tbody>...</tbody></table>",
-
-  "widget_5": "<HTML BLOB> 'Our Top Pick' styled card module. This is a visually distinct callout card.
+  "widget_2": "<HTML BLOB> 'Our Top Pick' styled card module. This is a visually distinct callout card.
     Use this EXACT inline-CSS HTML structure:
     <div style='background:#f5f9f5;border:1px solid #e0e8e0;border-radius:10px;padding:24px;font-family:sans-serif;max-width:700px;'><div style='display:flex;align-items:flex-start;gap:16px;'><span style='background:#4a7c59;color:white;font-size:13px;font-weight:600;padding:4px 14px;border-radius:20px;white-space:nowrap;'>Our top pick</span><div><p style='margin:0 0 12px 0;font-size:16px;line-height:1.5;'><strong>[Product Name]</strong> — [1-2 sentence blurb about why it's the top pick. Mention key appeal, price point, who it's best for. Casual, encouraging tone.]</p><a href='[affiliate_url]' style='display:inline-block;border:1px solid #999;border-radius:6px;padding:8px 18px;text-decoration:none;color:#333;font-size:14px;'>Shop on Amazon &rarr;</a></div></div></div>
     Fill in the actual product name, blurb, and affiliate URL for the top_pick product.",
 
-  "widget_6": "<HTML BLOB> 'The Three Tiers: budget, mid-range, and premium' module.
+  "widget_3": "<HTML BLOB> 'Why You Need This Gear' section. <h2> heading. 2-3 paragraphs explaining
+    why this gear matters, common use cases, and what beginners should know. Relatable scenarios.",
+
+  "widget_4": "<HTML BLOB> 'The Three Tiers: budget, mid-range, and premium' module.
     Use this EXACT inline-CSS HTML structure:
     <h2 style='font-family:sans-serif;font-size:22px;margin-bottom:6px;'>The three tiers: budget, mid-range, and premium</h2><p style='font-family:sans-serif;color:#555;margin-bottom:20px;'>[1-2 sentences explaining why you organized picks by price — the right answer depends on budget and commitment level. Use a relatable example.]</p><div style='display:flex;gap:16px;flex-wrap:wrap;'><div style='flex:1;min-width:200px;border:1px solid #e0e0e0;border-radius:10px;padding:20px;font-family:sans-serif;'><p style='font-size:12px;color:#666;margin:0 0 8px 0;'>Budget &middot; under $XX</p><p style='font-weight:600;margin:0 0 4px 0;'>[Budget Product Name]</p><p style='font-size:22px;font-weight:700;margin:0 0 6px 0;'>$XX</p><p style='color:#c17328;font-size:14px;margin:0 0 10px 0;'>[star rating display] [rating number]</p><p style='font-size:14px;line-height:1.5;color:#444;margin:0 0 14px 0;'>[2-3 sentence blurb about this budget pick]</p><a href='[budget_affiliate_url]' style='display:inline-block;border:1px solid #999;border-radius:6px;padding:8px 18px;text-decoration:none;color:#333;font-size:14px;'>Shop on Amazon</a></div><div style='flex:1;min-width:200px;border:2px solid #c17328;border-radius:10px;padding:20px;font-family:sans-serif;'><p style='font-size:12px;color:#c17328;font-weight:600;margin:0 0 8px 0;'>Best value &middot; $XX&ndash;$XX</p><p style='font-weight:600;margin:0 0 4px 0;'>[Mid-Range Product Name]</p><p style='font-size:22px;font-weight:700;margin:0 0 6px 0;'>$XX</p><p style='color:#c17328;font-size:14px;margin:0 0 10px 0;'>[star rating display] [rating number]</p><p style='font-size:14px;line-height:1.5;color:#444;margin:0 0 14px 0;'>[2-3 sentence blurb about this mid-range pick]</p><a href='[midrange_affiliate_url]' style='display:inline-block;border:1px solid #999;border-radius:6px;padding:8px 18px;text-decoration:none;color:#333;font-size:14px;'>Shop on Amazon</a></div><div style='flex:1;min-width:200px;border:1px solid #e0e0e0;border-radius:10px;padding:20px;font-family:sans-serif;'><p style='font-size:12px;color:#666;margin:0 0 8px 0;'>Premium &middot; $XX+</p><p style='font-weight:600;margin:0 0 4px 0;'>[Premium Product Name]</p><p style='font-size:22px;font-weight:700;margin:0 0 6px 0;'>$XX</p><p style='color:#c17328;font-size:14px;margin:0 0 10px 0;'>[star rating display] [rating number]</p><p style='font-size:14px;line-height:1.5;color:#444;margin:0 0 14px 0;'>[2-3 sentence blurb about this premium pick]</p><a href='[premium_affiliate_url]' style='display:inline-block;border:1px solid #999;border-radius:6px;padding:8px 18px;text-decoration:none;color:#333;font-size:14px;'>Shop on Amazon</a></div></div>
     Fill in real product names, prices, ratings, blurbs, and affiliate URLs for the budget_pick, midrange_pick, and premium_pick products.
     For star ratings, use Unicode stars: ★ for full stars, ☆ for empty. Example: ★★★★☆ 4.1
     The mid-range card has a thicker orange border (2px solid #c17328) and orange tier label to highlight it as 'Best value'.",
+
+  "widget_5": "<HTML BLOB> 'Top Features to Look For' section. <h2> heading. Break down the most
+    important features/specs for this category. Explain each in plain English. Use <h3> for each
+    feature. Include how each feature affects the buying decision.",
+
+  "widget_6": "<HTML BLOB> Comparison table. <h2> heading 'Our Top Picks at a Glance'.
+    Create an HTML <table> with inline CSS styling for readability. Columns: Rank, Product, Price, Rating, Best For.
+    Each product name should be an <a> linking to its affiliate_url.
+    Include all {len(products)} products.
+    Table styling: use inline styles for borders, padding, alternating row colors, header background.
+    Example structure: <h2 style='color:#c17328;font-family:sans-serif;'>Our Top Picks at a Glance</h2><table style='width:100%;border-collapse:collapse;font-family:sans-serif;'><thead><tr style='background:#f5f5f5;'><th style='padding:10px;text-align:left;border-bottom:2px solid #ddd;'>Rank</th>...</tr></thead><tbody>...</tbody></table>",
 
   "widget_7": "<HTML BLOB> 'How to Choose' buying guidance. <h2> heading. Practical advice on
     selecting the right product. Address fit considerations, size guides, use-case differences.
@@ -518,8 +518,8 @@ def regenerate_widget_for_price_change(
     """Regenerate a single widget HTML when a product's price changes.
 
     Used by the Sunday price check workflow.
-    - widget_5 (Our Top Pick card): regenerates the styled top pick card
-    - widget_6 (Three Tiers): regenerates all three tier cards (needs all_tier_products)
+    - widget_2 (Our Top Pick card): regenerates the styled top pick card
+    - widget_4 (Three Tiers): regenerates all three tier cards (needs all_tier_products)
 
     Output is a single-line HTML blob with inline CSS (no line breaks).
     """
@@ -527,7 +527,7 @@ def regenerate_widget_for_price_change(
     if not api_key:
         raise ContentGeneratorError("ANTHROPIC_API_KEY must be set")
 
-    if widget_number == 5:
+    if widget_number == 2:
         # Top Pick card
         prompt = f"""Regenerate the 'Our Top Pick' HTML card for {config.site_name}.
 
@@ -544,7 +544,7 @@ Generate a single-line HTML blob (NO line breaks) using this structure:
 Voice: casual, encouraging, beginner-friendly. No invented specs. Use single quotes for HTML attributes.
 Return ONLY the single-line HTML blob, no markdown or code blocks."""
 
-    elif widget_number == 6 and all_tier_products:
+    elif widget_number == 4 and all_tier_products:
         # Three Tiers card — needs all three products
         tier_data = []
         for tp in all_tier_products:
