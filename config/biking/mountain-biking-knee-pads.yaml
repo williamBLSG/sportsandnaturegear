@@ -1,0 +1,69 @@
+# ── Biking Article Config ──────────────────────────────────────
+# Pipeline: biking daily article builder
+
+article_id: mountain-biking-knee-pads
+category_id: biking
+display_name: "Mountain Biking Knee Pads"
+site_name: "Sports & Nature Gear"
+site_url: "https://www.sportsandnaturegear.com"
+
+# ── Amazon Creators API ─────────────────────────────────────────
+search_index: SportsAndOutdoors
+keywords: "mountain biking knee pads"
+min_reviews: 10
+min_rating: 2.5
+price_min_usd: 35
+price_max_usd: 150
+product_count_target: 7
+
+top_brands:
+  - Fox Racing
+  - Troy Lee Designs
+  - G-Form
+  - POC
+  - Leatt
+  - Specialized
+  - Bluegrass
+  - 100%
+  - Evoc
+  - 661
+
+# ── Affiliate ────────────────────────────────────────────────────
+assoc_tag: "${AMZ_ASSOC_TAG}"
+geniuslink_group_id: "biking"
+geniuslink_group_numeric_id: 422521
+
+# ── SEO & Page ───────────────────────────────────────────────────
+slug: "/biking/biking-gear/mountain-biking-knee-pads"
+page_title: "Best Mountain Biking Knee Pads: Comfortable Protection for Trail Riders"
+meta_title: "Best MTB Knee Pads 2026: Trail Protection Picks"
+meta_description: "G-Form and Fox Racing lead our top MTB knee pads. Flexible, comfy picks for trail riding beginners. Updated weekly."
+primary_keyword: "mountain biking knee pads"
+secondary_keywords:
+  - best MTB knee pads
+  - mountain bike knee protection
+  - lightweight knee pads for biking
+  - G-Form knee pads
+  - trail riding knee pads
+  - women's mountain biking knee pads
+target_word_count_min: 2000
+target_word_count_max: 2400
+
+# ── Google Trends ────────────────────────────────────────────────
+trends_keyword: "mtb knee pads"
+
+# ── Editorial ────────────────────────────────────────────────────
+editorial_notes: >
+  Hard-shell vs. soft/flexible is the #1 education moment. G-Form's flexible pads are the beginner gateway — comfortable enough
+  to wear all day and fit under pants. Fox Racing is the trusted name. Frame the guide around a first-time trail rider who's nervous
+  about falls. Key differentiators are pedaling comfort (can you ride comfortably with them on?), coverage area, and breathability.
+  Most beginners will buy G-Form and upgrade later if they get more serious.
+
+# ── Airtable ─────────────────────────────────────────────────────
+airtable_base_id: "${AIRTABLE_SOFTBALL_BASE_ID}"
+table_articles: "biking-articles"
+table_products: "biking-products"
+table_faq: "biking-faq"
+
+# ── Internal Links ───────────────────────────────────────────────
+internal_links: []

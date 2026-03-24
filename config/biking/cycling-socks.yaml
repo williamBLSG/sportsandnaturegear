@@ -1,0 +1,67 @@
+# ── Biking Article Config ──────────────────────────────────────
+# Pipeline: biking daily article builder
+
+article_id: cycling-socks
+category_id: biking
+display_name: "Cycling Socks"
+site_name: "Sports & Nature Gear"
+site_url: "https://www.sportsandnaturegear.com"
+
+# ── Amazon Creators API ─────────────────────────────────────────
+search_index: SportsAndOutdoors
+keywords: "women's cycling socks"
+min_reviews: 10
+min_rating: 2.5
+price_min_usd: 12
+price_max_usd: 35
+product_count_target: 7
+
+top_brands:
+  - Pearl Izumi
+  - Swiftwick
+  - Feetures
+  - Defeet
+  - Rockwool
+  - Castelli
+  - Rapha
+  - Specialized
+  - Giro
+  - Smartwool
+
+# ── Affiliate ────────────────────────────────────────────────────
+assoc_tag: "${AMZ_ASSOC_TAG}"
+geniuslink_group_id: "biking"
+geniuslink_group_numeric_id: 422521
+
+# ── SEO & Page ───────────────────────────────────────────────────
+slug: "/biking/biking-gear/cycling-socks"
+page_title: "Best Women's Cycling Socks: Comfortable Picks for Road and Trail"
+meta_title: "Best Women's Cycling Socks 2026: Top Picks"
+meta_description: "Swiftwick and Pearl Izumi lead our top women's cycling socks. Comfy, breathable picks for every ride. Updated weekly."
+primary_keyword: "women's cycling socks"
+secondary_keywords:
+  - best cycling socks for women
+  - women's bike socks
+  - breathable cycling socks
+  - merino cycling socks
+  - performance cycling socks
+target_word_count_min: 1200
+target_word_count_max: 1500
+
+# ── Google Trends ────────────────────────────────────────────────
+trends_keyword: "cycling socks"
+
+# ── Editorial ────────────────────────────────────────────────────
+editorial_notes: >
+  Shorter guide — 1,200-1,500 words is plenty. Key buyer questions are length (ankle vs. crew), material (merino vs. synthetic),
+  and summer vs. cold weather. Don't overcomplicate it. Pearl Izumi and Swiftwick are the accessible anchor brands. Lower research
+  barrier for the buyer — most just want comfortable, durable, breathable. Smartwool is worth including for cold-weather angle.
+
+# ── Airtable ─────────────────────────────────────────────────────
+airtable_base_id: "${AIRTABLE_SOFTBALL_BASE_ID}"
+table_articles: "biking-articles"
+table_products: "biking-products"
+table_faq: "biking-faq"
+
+# ── Internal Links ───────────────────────────────────────────────
+internal_links: []

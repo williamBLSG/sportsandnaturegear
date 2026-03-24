@@ -1,0 +1,68 @@
+# ── Biking Article Config ──────────────────────────────────────
+# Pipeline: biking daily article builder
+
+article_id: mountain-biking-hydration-packs
+category_id: biking
+display_name: "Mountain Biking Hydration Packs"
+site_name: "Sports & Nature Gear"
+site_url: "https://www.sportsandnaturegear.com"
+
+# ── Amazon Creators API ─────────────────────────────────────────
+search_index: SportsAndOutdoors
+keywords: "mountain biking hydration pack"
+min_reviews: 10
+min_rating: 2.5
+price_min_usd: 40
+price_max_usd: 160
+product_count_target: 7
+
+top_brands:
+  - CamelBak
+  - Osprey
+  - TETON Sports
+  - NICGID
+  - Evoc
+  - Deuter
+  - Patagonia
+  - Bontrager
+  - High Above
+
+# ── Affiliate ────────────────────────────────────────────────────
+assoc_tag: "${AMZ_ASSOC_TAG}"
+geniuslink_group_id: "biking"
+geniuslink_group_numeric_id: 422521
+
+# ── SEO & Page ───────────────────────────────────────────────────
+slug: "/biking/biking-gear/mountain-biking-hydration-packs"
+page_title: "Best Mountain Biking Hydration Packs: Backpacks and Hip Packs for Every Ride"
+meta_title: "Best MTB Hydration Packs 2026: Backpack & Hip Picks"
+meta_description: "CamelBak and Osprey lead our top MTB hydration packs. Backpack and hip pack picks for every ride length. Updated weekly."
+primary_keyword: "mountain biking hydration packs"
+secondary_keywords:
+  - best MTB hydration pack
+  - mountain bike water backpack
+  - hydration pack for biking
+  - CamelBak mountain bike
+  - hip pack for mountain biking
+  - women's hydration pack cycling
+target_word_count_min: 2000
+target_word_count_max: 2400
+
+# ── Google Trends ────────────────────────────────────────────────
+trends_keyword: "mtb hydration pack"
+
+# ── Editorial ────────────────────────────────────────────────────
+editorial_notes: >
+  Backpack vs. hip pack is the KEY decision point — explain it early with a simple use-case breakdown (short rides = hip pack,
+  all-day rides = backpack). CamelBak and Osprey own this category on Amazon. Osprey Raven is specifically the women's-specific
+  fit option — call it out. Explain bladder capacity (1.5L vs. 2L vs. 3L) in plain English as a simple decision framework. Key
+  buyer education — most beginners don't know the difference between backpack, hip pack, and vest.
+
+# ── Airtable ─────────────────────────────────────────────────────
+airtable_base_id: "${AIRTABLE_SOFTBALL_BASE_ID}"
+table_articles: "biking-articles"
+table_products: "biking-products"
+table_faq: "biking-faq"
+
+# ── Internal Links ───────────────────────────────────────────────
+internal_links: []

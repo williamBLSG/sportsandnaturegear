@@ -1,0 +1,73 @@
+# ── Biking Article Config ──────────────────────────────────────
+# Pipeline: biking daily article builder
+
+article_id: cycling-shorts
+category_id: biking
+display_name: "Cycling Shorts"
+site_name: "Sports & Nature Gear"
+site_url: "https://www.sportsandnaturegear.com"
+
+# ── Amazon Creators API ─────────────────────────────────────────
+search_index: SportsAndOutdoors
+keywords: "women's cycling shorts"
+min_reviews: 10
+min_rating: 2.5
+price_min_usd: 25
+price_max_usd: 100
+product_count_target: 8
+
+top_brands:
+  - Heathyoga
+  - Bikewa
+  - Nepest
+  - Sportneer
+  - Pearl Izumi
+  - baleaf
+  - LAMEDA
+  - Castelli
+  - Terry
+  - SHREDLY
+  - Fox Racing
+  - ZOIC
+  - Louis Garneau
+  - Velocio
+
+# ── Affiliate ────────────────────────────────────────────────────
+assoc_tag: "${AMZ_ASSOC_TAG}"
+geniuslink_group_id: "biking"
+geniuslink_group_numeric_id: 422521
+
+# ── SEO & Page ───────────────────────────────────────────────────
+slug: "/biking/biking-gear/cycling-shorts"
+page_title: "Best Women's Cycling Shorts: Padded Picks for Comfort on Every Ride"
+meta_title: "Best Women's Cycling Shorts 2026: Padded Picks"
+meta_description: "Terry and Pearl Izumi lead our top women's cycling shorts. Padded, comfy picks for road and trail. Updated weekly."
+primary_keyword: "women's cycling shorts"
+secondary_keywords:
+  - best women's cycling shorts
+  - padded bike shorts for women
+  - women's mountain bike shorts
+  - cycling bib shorts women
+  - comfortable bike shorts
+  - women's padded cycling shorts
+target_word_count_min: 2200
+target_word_count_max: 2600
+
+# ── Google Trends ────────────────────────────────────────────────
+trends_keyword: "women's cycling shorts"
+
+# ── Editorial ────────────────────────────────────────────────────
+editorial_notes: >
+  Clear split between road/rec padded shorts and MTB-style baggy shorts. Active Amy likely wants padded road shorts. Terry and
+  Pearl Izumi are the credible anchor brands; Heathyoga and Bikewa are the Amazon volume picks to include as value options. Bib
+  shorts vs. waistband is an education point worth a short section. Chamois pad quality (4D vs basic) is the key differentiator
+  beginners don't understand — explain it simply.
+
+# ── Airtable ─────────────────────────────────────────────────────
+airtable_base_id: "${AIRTABLE_SOFTBALL_BASE_ID}"
+table_articles: "biking-articles"
+table_products: "biking-products"
+table_faq: "biking-faq"
+
+# ── Internal Links ───────────────────────────────────────────────
+internal_links: []

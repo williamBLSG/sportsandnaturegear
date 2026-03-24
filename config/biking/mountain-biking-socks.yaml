@@ -1,0 +1,68 @@
+# ── Biking Article Config ──────────────────────────────────────
+# Pipeline: biking daily article builder
+
+article_id: mountain-biking-socks
+category_id: biking
+display_name: "Mountain Biking Socks"
+site_name: "Sports & Nature Gear"
+site_url: "https://www.sportsandnaturegear.com"
+
+# ── Amazon Creators API ─────────────────────────────────────────
+search_index: SportsAndOutdoors
+keywords: "mountain biking socks"
+min_reviews: 10
+min_rating: 2.5
+price_min_usd: 12
+price_max_usd: 38
+product_count_target: 7
+
+top_brands:
+  - Swiftwick
+  - Darn Tough
+  - Pearl Izumi
+  - Defeet
+  - Smartwool
+  - Fox Racing
+  - Troy Lee Designs
+  - Giro
+  - Specialized
+
+# ── Affiliate ────────────────────────────────────────────────────
+assoc_tag: "${AMZ_ASSOC_TAG}"
+geniuslink_group_id: "biking"
+geniuslink_group_numeric_id: 422521
+
+# ── SEO & Page ───────────────────────────────────────────────────
+slug: "/biking/biking-gear/mountain-biking-socks"
+page_title: "Best Mountain Biking Socks: Durable Picks for Trail Riders"
+meta_title: "Best Mountain Biking Socks 2026: Trail Picks"
+meta_description: "Darn Tough and Swiftwick lead our top MTB socks. Tall, durable picks for trail riding. Updated weekly."
+primary_keyword: "mountain biking socks"
+secondary_keywords:
+  - best MTB socks
+  - trail riding socks
+  - merino mountain biking socks
+  - tall cycling socks
+  - Darn Tough MTB socks
+  - women's mountain biking socks
+target_word_count_min: 1200
+target_word_count_max: 1500
+
+# ── Google Trends ────────────────────────────────────────────────
+trends_keyword: "mtb socks"
+
+# ── Editorial ────────────────────────────────────────────────────
+editorial_notes: >
+  MTB socks run taller (crew to knee-height) than road socks — that's the key differentiator from cycling socks. Darn Tough's
+  lifetime warranty is a strong story for the durability-focused buyer. Crew height (6-8 inches) is the MTB sweet spot. Swiftwick
+  and Darn Tough are the two names that keep appearing in every review source. Combine men's and women's into one guide. Low
+  complexity — key differentiators are length (ankle vs. crew vs. knee) and material (merino vs. synthetic).
+
+# ── Airtable ─────────────────────────────────────────────────────
+airtable_base_id: "${AIRTABLE_SOFTBALL_BASE_ID}"
+table_articles: "biking-articles"
+table_products: "biking-products"
+table_faq: "biking-faq"
+
+# ── Internal Links ───────────────────────────────────────────────
+internal_links: []

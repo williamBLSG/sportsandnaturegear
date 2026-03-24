@@ -1,0 +1,70 @@
+# ── Biking Article Config ──────────────────────────────────────
+# Pipeline: biking daily article builder
+
+article_id: bike-racks
+category_id: biking
+display_name: "Bike Racks"
+site_name: "Sports & Nature Gear"
+site_url: "https://www.sportsandnaturegear.com"
+
+# ── Amazon Creators API ─────────────────────────────────────────
+search_index: SportsAndOutdoors
+keywords: "bike racks for cars"
+min_reviews: 10
+min_rating: 2.5
+price_min_usd: 40
+price_max_usd: 700
+product_count_target: 9
+
+top_brands:
+  - Amazon Basics
+  - Saris
+  - Allen Sports
+  - MaxxHaul
+  - Hollywood Racks
+  - Yakima
+  - Thule
+  - Kuat
+  - KAC
+  - IKURAM
+  - Retrospec
+
+# ── Affiliate ────────────────────────────────────────────────────
+assoc_tag: "${AMZ_ASSOC_TAG}"
+geniuslink_group_id: "biking"
+geniuslink_group_numeric_id: 422521
+
+# ── SEO & Page ───────────────────────────────────────────────────
+slug: "/biking/biking-gear/bike-racks"
+page_title: "Best Bike Racks for Cars: Trunk-Mount and Hitch-Mount Picks for Every Budget"
+meta_title: "Best Bike Racks for Cars 2026: Trunk & Hitch Picks"
+meta_description: "Find the best bike rack for your car or SUV. Trunk-mount and hitch picks ranked by real buyer ratings. Updated weekly."
+primary_keyword: "bike racks for cars"
+secondary_keywords:
+  - best bike rack for SUV
+  - trunk mount bike rack
+  - hitch mount bike rack
+  - bike rack for family
+  - car bike rack
+  - e-bike rack
+target_word_count_min: 2400
+target_word_count_max: 2800
+
+# ── Google Trends ────────────────────────────────────────────────
+trends_keyword: "bike racks"
+
+# ── Editorial ────────────────────────────────────────────────────
+editorial_notes: >
+  Structure as trunk-mount vs. hitch-mount sections, NOT budget/mid/premium. The buyer either has a hitch or doesn't
+  — that's the first decision, not price. Include e-bike capacity callout (weight ratings matter). Frame around the family
+  SUV buyer — someone loading two kids' bikes and maybe an e-bike on a Saturday morning. Amazon Basics and Saris are the
+  accessible tier; Yakima and Thule are the credible upgrade. Hollywood Racks is a strong mid-range hitch option.
+
+# ── Airtable ─────────────────────────────────────────────────────
+airtable_base_id: "${AIRTABLE_SOFTBALL_BASE_ID}"
+table_articles: "biking-articles"
+table_products: "biking-products"
+table_faq: "biking-faq"
+
+# ── Internal Links ───────────────────────────────────────────────
+internal_links: []

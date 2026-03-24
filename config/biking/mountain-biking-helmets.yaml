@@ -1,0 +1,71 @@
+# ── Biking Article Config ──────────────────────────────────────
+# Pipeline: biking daily article builder
+
+article_id: mountain-biking-helmets
+category_id: biking
+display_name: "Mountain Biking Helmets"
+site_name: "Sports & Nature Gear"
+site_url: "https://www.sportsandnaturegear.com"
+
+# ── Amazon Creators API ─────────────────────────────────────────
+search_index: SportsAndOutdoors
+keywords: "mountain biking helmets"
+min_reviews: 10
+min_rating: 2.5
+price_min_usd: 50
+price_max_usd: 250
+product_count_target: 8
+
+top_brands:
+  - OutdoorMaster
+  - Retrospec
+  - ILM
+  - Exclusky
+  - Bell
+  - Giro
+  - POC
+  - Smith
+  - Specialized
+  - Fox Racing
+  - Troy Lee Designs
+
+# ── Affiliate ────────────────────────────────────────────────────
+assoc_tag: "${AMZ_ASSOC_TAG}"
+geniuslink_group_id: "biking"
+geniuslink_group_numeric_id: 422521
+
+# ── SEO & Page ───────────────────────────────────────────────────
+slug: "/biking/biking-gear/mountain-biking-helmets"
+page_title: "Best Mountain Biking Helmets: MIPS-Equipped Picks for Every Budget"
+meta_title: "Best Mountain Biking Helmets 2026: MIPS Picks"
+meta_description: "OutdoorMaster Gem MIPS leads our top MTB helmets, ranked by safety and buyer ratings. All picks include MIPS. Updated weekly."
+primary_keyword: "mountain biking helmets"
+secondary_keywords:
+  - best MTB helmets
+  - mountain bike helmets for women
+  - MIPS mountain bike helmet
+  - women's mountain biking helmet
+  - trail riding helmet
+  - enduro helmet
+target_word_count_min: 2400
+target_word_count_max: 2800
+
+# ── Google Trends ────────────────────────────────────────────────
+trends_keyword: "mtb helmets"
+
+# ── Editorial ────────────────────────────────────────────────────
+editorial_notes: >
+  MIPS explanation is MANDATORY — lead with it, explain it simply as a slip-plane layer that reduces rotational forces in a crash.
+  Virginia Tech helmet safety ratings are the credible third-party source to reference. Ponytail accommodation is a genuine women's
+  differentiator — several helmets now have ponytail ports, call this out. No helmet should be recommended without MIPS at any price
+  tier. OutdoorMaster Gem MIPS is the breakout Amazon brand — actually well-reviewed, not just cheap. POC and Smith are the premium
+  credibility brands. Trail vs. enduro fit is an education point for beginners.
+
+# ── Airtable ─────────────────────────────────────────────────────
+airtable_base_id: "${AIRTABLE_SOFTBALL_BASE_ID}"
+table_articles: "biking-articles"
+table_products: "biking-products"
+table_faq: "biking-faq"
+
+# ── Internal Links ───────────────────────────────────────────────
+internal_links: []
