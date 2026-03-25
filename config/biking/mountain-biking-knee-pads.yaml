@@ -24,9 +24,9 @@ top_brands:
   - Leatt
   - Specialized
   - Bluegrass
-  - 100%
+  - "100%"
   - Evoc
-  - 661
+  - "661"
 
 # ── Affiliate ────────────────────────────────────────────────────
 assoc_tag: "${AMZ_ASSOC_TAG}"

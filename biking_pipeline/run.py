@@ -146,7 +146,7 @@ def run_daily_build(article_id: str, force: bool = False) -> None:
     try:
         # Step 1: Load config
         logger.info("=" * 60)
-        logger.info("SOFTBALL PIPELINE: %s (%s)", article_id, run_type)
+        logger.info("BIKING PIPELINE: %s (%s)", article_id, run_type)
         logger.info("=" * 60)
 
         config = config_loader.load(article_id)
