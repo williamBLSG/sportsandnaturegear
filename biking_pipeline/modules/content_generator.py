@@ -548,7 +548,7 @@ Return ONLY the single-line HTML blob, no markdown or code blocks."""
         # Three Tiers card — needs all three products
         tier_data = []
         for tp in all_tier_products:
-            tier_data.append(f"- {tp.role}: {tp.full_name}, ${tp.price_usd:.2f if tp.price_usd else 0}, "
+            tier_data.append(f"- {tp.role}: {tp.full_name}, ${(tp.price_usd if tp.price_usd else 0):.2f}, "
                            f"rating {tp.rating or 'N/A'}, URL: {tp.affiliate_url}")
 
         prompt = f"""Regenerate the 'Three Tiers: budget, mid-range, and premium' HTML module for {config.site_name}.
