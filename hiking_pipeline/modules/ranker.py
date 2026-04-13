@@ -66,11 +66,15 @@ def _normalize_brands(
         })
 
     known_brands = config.top_brands + [
-        "Rawlings", "Wilson", "Mizuno", "Nokona", "Easton",
-        "Louisville Slugger", "DeMarini", "Dudley", "Worth",
-        "Champro", "Diamond", "Franklin", "Miken", "Anderson",
-        "Marucci", "New Balance", "Under Armour", "Nike", "Adidas",
-        "Ringor", "Boombah",
+        "Merrell", "Salomon", "Columbia", "KEEN", "Danner", "Vasque",
+        "Osprey", "Deuter", "Gregory", "CamelBak", "MYSTERY RANCH",
+        "The North Face", "Black Diamond", "LEKI", "TrailBuddy",
+        "Cascade Mountain Tech", "Hydro Flask", "YETI", "Stanley",
+        "Chaco", "Teva", "prAna", "Kuhl", "Arc'teryx", "Eddie Bauer",
+        "REI Co-op", "Hi-Tec", "NORTIV 8", "Timberland", "La Sportiva",
+        "Teton Sports", "Iron Flask", "Simple Modern", "Nalgene",
+        "Adventure Medical Kits", "Surviveware", "BALEAF", "Willit",
+        "New Balance", "Under Armour", "Nike", "Adidas",
     ]
     # Deduplicate
     known_brands = sorted(set(known_brands))
@@ -82,9 +86,9 @@ Known hiking brands: {', '.join(known_brands)}
 Rules:
 - Brand should be title-case and match the known brand list when possible
 - Model should be the specific product name WITHOUT color, size, gender, or "hiking" qualifier
-  Example: "Rawlings Liberty Advanced Color Series 13" Fastpitch Hiking Glove - RLA130-6RS" → brand: "Rawlings", model: "Liberty Advanced"
-  Example: "Louisville Slugger LXT -10 Fastpitch Hiking Bat" → brand: "Louisville Slugger", model: "LXT"
-  Example: "Dudley Thunder ZN 12\" ASA Slowpitch Hiking" → brand: "Dudley", model: "Thunder ZN"
+  Example: "Merrell Women's Moab 3 Mid Waterproof Hiking Boot" → brand: "Merrell", model: "Moab 3 Mid"
+  Example: "Osprey Daylite Plus Daypack" → brand: "Osprey", model: "Daylite Plus"
+  Example: "Black Diamond Trail Trekking Poles" → brand: "Black Diamond", model: "Trail"
 - full_name is "{{brand}} {{model}}"
 - If brand can't be determined from the title or brand field, use the brand field value
 - If model can't be determined, use a short descriptive name from the title
@@ -102,7 +106,7 @@ Return ONLY the JSON array, no other text."""
     try:
         response = client.messages.create(
             model=MODEL_ID,
-            max_tokens=2048,
+            max_tokens=4096,
             messages=[{"role": "user", "content": prompt}],
         )
         response_text = response.content[0].text.strip()
