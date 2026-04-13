@@ -153,7 +153,9 @@ def run_daily_build(article_id: str, force: bool = False) -> None:
 
         # Step 2: Collect signals
         logger.info("--- Step 2: Signals Collection ---")
-        signals = signals_collector.collect(config, run_date, force=force)
+        # Build supplemental brand-specific searches to ensure top brands appear
+        supplemental = [f"{brand} {config.display_name.lower()}" for brand in config.top_brands[:5]]
+        signals = signals_collector.collect(config, run_date, supplemental_keywords=supplemental, force=force)
         run_log.products_found = signals.total_api_results
         run_log.products_after_filter = signals.products_after_filter
 
