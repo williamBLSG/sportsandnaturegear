@@ -1,0 +1,74 @@
+# ── Hiking Article Config ──────────────────────────────────────
+# Pipeline: hiking daily article builder
+
+article_id: hiking-shorts
+category_id: hiking
+display_name: "Hiking Shorts"
+site_name: "Sports & Nature Gear"
+site_url: "https://www.sportsandnaturegear.com"
+
+# ── Amazon Creators API ─────────────────────────────────────────
+search_index: SportsAndOutdoors
+keywords: "hiking shorts women"
+min_reviews: 10
+min_rating: 2.5
+price_min_usd: 15
+price_max_usd: 100
+product_count_target: 8
+
+top_brands:
+  - Columbia
+  - prAna
+  - The North Face
+  - CRZ YOGA
+  - Willit
+  - Little Donkey Andy
+  - Libin
+  - BALEAF
+  - Kuhl
+  - REI Co-op
+
+# ── Affiliate ────────────────────────────────────────────────────
+assoc_tag: "${AMZ_ASSOC_TAG}"
+geniuslink_group_id: "hiking"
+geniuslink_group_numeric_id: 0  # UPDATE after creating GeniusLink group
+
+# ── SEO & Page ───────────────────────────────────────────────────
+slug: "/hiking/hiking-gear/hiking-shorts"
+page_title: "Best Hiking Shorts: Quick-Dry, Comfortable Picks for the Trail"
+meta_title: "Best Hiking Shorts 2026: Women's Trail Picks"
+meta_description: "Columbia and prAna lead our top hiking shorts, ranked by comfort, quick-dry performance, and buyer ratings. Updated weekly."
+primary_keyword: "hiking shorts"
+secondary_keywords:
+  - best hiking shorts for women
+  - women's hiking shorts
+  - quick dry hiking shorts
+  - hiking shorts with pockets
+  - lightweight hiking shorts
+  - cargo hiking shorts
+target_word_count_min: 2200
+target_word_count_max: 2600
+
+# ── Google Trends ────────────────────────────────────────────────
+trends_keyword: "hiking shorts women"
+
+# ── Editorial ────────────────────────────────────────────────────
+editorial_notes: >
+  Inseam length is the #1 fit question — explain 5" vs. 7" vs. 9" in practical terms. Quick-dry
+  fabric matters for sweat and stream crossings. Pockets (especially zippered) are a trail essential.
+  Built-in liner vs. no liner is a comfort preference. UPF protection is a bonus. Columbia Sandy
+  River is the perennial bestseller. BALEAF and Willit dominate the Amazon budget tier with strong
+  reviews. prAna is the premium upgrade.
+
+# ── Airtable ─────────────────────────────────────────────────────
+airtable_base_id: "${AIRTABLE_SOFTBALL_BASE_ID}"
+table_articles: "hiking-articles"
+table_products: "hiking-products"
+table_faq: "hiking-faq"
+
+# ── Internal Links ───────────────────────────────────────────────
+internal_links:
+  - anchor: "hiking pants"
+    slug: "/hiking/hiking-gear/hiking-pants"
+  - anchor: "hiking boots"
+    slug: "/hiking/hiking-gear/hiking-boots"

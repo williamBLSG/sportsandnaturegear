@@ -1,0 +1,74 @@
+# ── Hiking Article Config ──────────────────────────────────────
+# Pipeline: hiking daily article builder
+
+article_id: hiking-pants
+category_id: hiking
+display_name: "Hiking Pants"
+site_name: "Sports & Nature Gear"
+site_url: "https://www.sportsandnaturegear.com"
+
+# ── Amazon Creators API ─────────────────────────────────────────
+search_index: SportsAndOutdoors
+keywords: "hiking pants women"
+min_reviews: 10
+min_rating: 2.5
+price_min_usd: 20
+price_max_usd: 150
+product_count_target: 8
+
+top_brands:
+  - prAna
+  - Columbia
+  - Outdoor Voices
+  - CRZ YOGA
+  - Willit
+  - Little Donkey Andy
+  - Arc'teryx
+  - Kuhl
+  - Eddie Bauer
+  - REI Co-op
+
+# ── Affiliate ────────────────────────────────────────────────────
+assoc_tag: "${AMZ_ASSOC_TAG}"
+geniuslink_group_id: "hiking"
+geniuslink_group_numeric_id: 0  # UPDATE after creating GeniusLink group
+
+# ── SEO & Page ───────────────────────────────────────────────────
+slug: "/hiking/hiking-gear/hiking-pants"
+page_title: "Best Hiking Pants: Comfortable, Stretchy Picks for the Trail"
+meta_title: "Best Hiking Pants 2026: Women's Trail Picks"
+meta_description: "Columbia and prAna lead our top hiking pants, ranked by comfort, stretch, and buyer ratings. Updated weekly."
+primary_keyword: "hiking pants"
+secondary_keywords:
+  - best hiking pants for women
+  - women's hiking pants
+  - lightweight hiking pants
+  - stretchy hiking pants
+  - convertible hiking pants
+  - water resistant hiking pants
+target_word_count_min: 2200
+target_word_count_max: 2600
+
+# ── Google Trends ────────────────────────────────────────────────
+trends_keyword: "hiking pants women"
+
+# ── Editorial ────────────────────────────────────────────────────
+editorial_notes: >
+  Stretch and mobility matter most to beginners — lead with comfort, not tech specs. Convertible
+  (zip-off legs) vs. full-length is a practical decision point. Water resistance vs. waterproof —
+  explain the difference simply. UPF sun protection is a bonus feature worth calling out. prAna
+  and Kuhl are the premium credibility brands. Columbia is the value leader. CRZ YOGA and Willit
+  are the Amazon favorites at budget prices. Pocket placement matters for trail practicality.
+
+# ── Airtable ─────────────────────────────────────────────────────
+airtable_base_id: "${AIRTABLE_SOFTBALL_BASE_ID}"
+table_articles: "hiking-articles"
+table_products: "hiking-products"
+table_faq: "hiking-faq"
+
+# ── Internal Links ───────────────────────────────────────────────
+internal_links:
+  - anchor: "hiking shorts"
+    slug: "/hiking/hiking-gear/hiking-shorts"
+  - anchor: "hiking boots"
+    slug: "/hiking/hiking-gear/hiking-boots"

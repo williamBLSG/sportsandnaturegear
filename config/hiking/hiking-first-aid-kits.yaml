@@ -1,0 +1,73 @@
+# ── Hiking Article Config ──────────────────────────────────────
+# Pipeline: hiking daily article builder
+
+article_id: hiking-first-aid-kits
+category_id: hiking
+display_name: "Hiking First Aid Kits"
+site_name: "Sports & Nature Gear"
+site_url: "https://www.sportsandnaturegear.com"
+
+# ── Amazon Creators API ─────────────────────────────────────────
+search_index: SportsAndOutdoors
+keywords: "hiking first aid kit"
+min_reviews: 10
+min_rating: 2.5
+price_min_usd: 10
+price_max_usd: 80
+product_count_target: 7
+
+top_brands:
+  - Adventure Medical Kits
+  - HART Health
+  - Surviveware
+  - My Medic
+  - Be Smart Get Prepared
+  - Coleman
+  - Everlit
+  - Swiss Safe
+
+# ── Affiliate ────────────────────────────────────────────────────
+assoc_tag: "${AMZ_ASSOC_TAG}"
+geniuslink_group_id: "hiking"
+geniuslink_group_numeric_id: 0  # UPDATE after creating GeniusLink group
+
+# ── SEO & Page ───────────────────────────────────────────────────
+slug: "/hiking/hiking-gear/hiking-first-aid-kits"
+page_title: "Best Hiking First Aid Kits: Trail-Ready Safety Picks"
+meta_title: "Best Hiking First Aid Kits 2026: Safety Picks"
+meta_description: "Adventure Medical Kits leads our top hiking first aid kits, ranked by contents, portability, and buyer ratings. Updated weekly."
+primary_keyword: "hiking first aid kit"
+secondary_keywords:
+  - best hiking first aid kit
+  - trail first aid kit
+  - backpacking first aid kit
+  - compact first aid kit for hiking
+  - wilderness first aid kit
+  - outdoor first aid kit
+target_word_count_min: 2000
+target_word_count_max: 2400
+
+# ── Google Trends ────────────────────────────────────────────────
+trends_keyword: "hiking first aid kit"
+
+# ── Editorial ────────────────────────────────────────────────────
+editorial_notes: >
+  Contents matter more than item count — a kit with 200 pieces of bandaids isn't better than one
+  with 50 well-chosen items. Key items to call out: blister treatment (moleskin, hydrocolloid
+  bandages), wound cleaning supplies, SAM splint for sprains, tweezers for ticks/splinters,
+  antihistamines for allergic reactions. Weight and packability matter for day hikers. Adventure
+  Medical Kits is the credibility brand used by outdoor professionals. Surviveware and Everlit
+  are strong Amazon sellers. Mention that Amy should customize any pre-built kit with personal meds.
+
+# ── Airtable ─────────────────────────────────────────────────────
+airtable_base_id: "${AIRTABLE_SOFTBALL_BASE_ID}"
+table_articles: "hiking-articles"
+table_products: "hiking-products"
+table_faq: "hiking-faq"
+
+# ── Internal Links ───────────────────────────────────────────────
+internal_links:
+  - anchor: "hiking backpacks"
+    slug: "/hiking/hiking-gear/hiking-backpacks"
+  - anchor: "insulated water bottles"
+    slug: "/hiking/hiking-gear/insulated-water-bottles"

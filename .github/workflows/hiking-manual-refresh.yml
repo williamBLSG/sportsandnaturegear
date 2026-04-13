@@ -1,0 +1,63 @@
+# Hiking Manual Product Refresh
+# Full product discovery + editorial refresh, triggered manually.
+# Same as daily_build but with force=True (re-queries all APIs).
+
+name: Hiking Manual Refresh
+
+on:
+  workflow_dispatch:
+    inputs:
+      article_id:
+        description: 'Article ID to refresh (e.g., hiking-boots)'
+        required: true
+        type: string
+
+env:
+  AMZ_CREATORS_ACCESS_KEY: ${{ secrets.AMZ_CREATORS_ACCESS_KEY }}
+  AMZ_CREATORS_SECRET_KEY: ${{ secrets.AMZ_CREATORS_SECRET_KEY }}
+  AMZ_ASSOC_TAG: ${{ secrets.AMZ_ASSOC_TAG }}
+  GENIUSLINK_API_KEY: ${{ secrets.GENIUSLINK_API_KEY }}
+  GENIUSLINK_API_SECRET: ${{ secrets.GENIUSLINK_API_SECRET }}
+  ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+  AIRTABLE_ACCESS_TOKEN: ${{ secrets.AIRTABLE_ACCESS_TOKEN }}
+  AIRTABLE_SOFTBALL_BASE_ID: ${{ secrets.AIRTABLE_SOFTBALL_BASE_ID }}
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Restore GeniusLink cache
+        uses: actions/cache@v4
+        with:
+          path: runs/hiking/geniuslink_cache.json
+          key: geniuslink-hiking-${{ github.run_id }}
+          restore-keys: |
+            geniuslink-hiking-
+
+      - name: Run manual refresh
+        run: |
+          python -m hiking_pipeline.run \
+            --article ${{ inputs.article_id }} \
+            --type manual_refresh
+
+      - name: Upload run artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hiking-refresh-${{ inputs.article_id }}-${{ github.run_id }}
+          path: runs/hiking/${{ inputs.article_id }}/
+          retention-days: 30

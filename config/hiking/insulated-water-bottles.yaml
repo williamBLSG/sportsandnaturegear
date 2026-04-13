@@ -1,0 +1,75 @@
+# ── Hiking Article Config ──────────────────────────────────────
+# Pipeline: hiking daily article builder
+
+article_id: insulated-water-bottles
+category_id: hiking
+display_name: "Insulated Water Bottles"
+site_name: "Sports & Nature Gear"
+site_url: "https://www.sportsandnaturegear.com"
+
+# ── Amazon Creators API ─────────────────────────────────────────
+search_index: SportsAndOutdoors
+keywords: "insulated water bottle hiking"
+min_reviews: 10
+min_rating: 2.5
+price_min_usd: 10
+price_max_usd: 60
+product_count_target: 8
+
+top_brands:
+  - Hydro Flask
+  - YETI
+  - Stanley
+  - CamelBak
+  - Klean Kanteen
+  - Nalgene
+  - Iron Flask
+  - Takeya
+  - S'well
+  - Simple Modern
+
+# ── Affiliate ────────────────────────────────────────────────────
+assoc_tag: "${AMZ_ASSOC_TAG}"
+geniuslink_group_id: "hiking"
+geniuslink_group_numeric_id: 0  # UPDATE after creating GeniusLink group
+
+# ── SEO & Page ───────────────────────────────────────────────────
+slug: "/hiking/hiking-gear/insulated-water-bottles"
+page_title: "Best Insulated Water Bottles for Hiking: Keep It Cold All Day"
+meta_title: "Best Insulated Water Bottles 2026: Hiking Picks"
+meta_description: "Hydro Flask and Stanley lead our top insulated water bottles for hiking, ranked by insulation, durability, and buyer ratings. Updated weekly."
+primary_keyword: "insulated water bottles"
+secondary_keywords:
+  - best insulated water bottle for hiking
+  - hiking water bottle
+  - stainless steel water bottle
+  - vacuum insulated water bottle
+  - water bottle for trail
+  - cold water bottle hiking
+target_word_count_min: 2200
+target_word_count_max: 2600
+
+# ── Google Trends ────────────────────────────────────────────────
+trends_keyword: "insulated water bottle"
+
+# ── Editorial ────────────────────────────────────────────────────
+editorial_notes: >
+  Insulation hours is the lead spec — explain double-wall vacuum insulation simply. Size matters
+  for hiking: 24 oz for short hikes, 32 oz for full-day, 40+ oz for hot-weather or family trips.
+  Lid type is a real usability differentiator (straw vs. chug vs. wide-mouth). Weight matters when
+  it's going in a pack. Stanley and Hydro Flask are the lifestyle credibility brands. Iron Flask and
+  Simple Modern are the Amazon value leaders with excellent reviews. YETI is the premium upgrade.
+  Mention that these bottles work for the whole family — kids' sizes exist from most brands.
+
+# ── Airtable ─────────────────────────────────────────────────────
+airtable_base_id: "${AIRTABLE_SOFTBALL_BASE_ID}"
+table_articles: "hiking-articles"
+table_products: "hiking-products"
+table_faq: "hiking-faq"
+
+# ── Internal Links ───────────────────────────────────────────────
+internal_links:
+  - anchor: "hiking backpacks"
+    slug: "/hiking/hiking-gear/hiking-backpacks"
+  - anchor: "hiking first aid kits"
+    slug: "/hiking/hiking-gear/hiking-first-aid-kits"

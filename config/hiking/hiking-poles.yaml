@@ -1,0 +1,72 @@
+# ── Hiking Article Config ──────────────────────────────────────
+# Pipeline: hiking daily article builder
+
+article_id: hiking-poles
+category_id: hiking
+display_name: "Hiking Poles"
+site_name: "Sports & Nature Gear"
+site_url: "https://www.sportsandnaturegear.com"
+
+# ── Amazon Creators API ─────────────────────────────────────────
+search_index: SportsAndOutdoors
+keywords: "hiking poles trekking poles"
+min_reviews: 10
+min_rating: 2.5
+price_min_usd: 15
+price_max_usd: 200
+product_count_target: 8
+
+top_brands:
+  - Black Diamond
+  - LEKI
+  - TrailBuddy
+  - Cascade Mountain Tech
+  - Foxelli
+  - Retrospec
+  - Montem
+  - REI Co-op
+
+# ── Affiliate ────────────────────────────────────────────────────
+assoc_tag: "${AMZ_ASSOC_TAG}"
+geniuslink_group_id: "hiking"
+geniuslink_group_numeric_id: 0  # UPDATE after creating GeniusLink group
+
+# ── SEO & Page ───────────────────────────────────────────────────
+slug: "/hiking/hiking-gear/hiking-poles"
+page_title: "Best Hiking Poles: Trekking Poles for Stability and Comfort"
+meta_title: "Best Hiking Poles 2026: Trekking Pole Picks"
+meta_description: "Black Diamond and TrailBuddy lead our top hiking poles, ranked by buyer ratings and trail performance. Updated weekly."
+primary_keyword: "hiking poles"
+secondary_keywords:
+  - best hiking poles
+  - trekking poles
+  - hiking poles for beginners
+  - lightweight trekking poles
+  - collapsible hiking poles
+  - carbon fiber trekking poles
+target_word_count_min: 2200
+target_word_count_max: 2600
+
+# ── Google Trends ────────────────────────────────────────────────
+trends_keyword: "trekking poles"
+
+# ── Editorial ────────────────────────────────────────────────────
+editorial_notes: >
+  Collapse mechanism is the #1 decision: telescoping (twist-lock or lever-lock) vs. folding (Z-pole).
+  Explain simply — folding packs smaller, telescoping adjusts length more. Material matters: aluminum
+  is durable and cheap, carbon fiber is lighter but can snap on impact. Cork vs. foam vs. rubber grips
+  — cork wicks sweat, foam is soft, rubber is cold-weather. Cascade Mountain Tech is the Amazon
+  bestseller at budget price. Black Diamond and LEKI are the premium credibility brands.
+
+# ── Airtable ─────────────────────────────────────────────────────
+airtable_base_id: "${AIRTABLE_SOFTBALL_BASE_ID}"
+table_articles: "hiking-articles"
+table_products: "hiking-products"
+table_faq: "hiking-faq"
+
+# ── Internal Links ───────────────────────────────────────────────
+internal_links:
+  - anchor: "hiking boots"
+    slug: "/hiking/hiking-gear/hiking-boots"
+  - anchor: "hiking backpacks"
+    slug: "/hiking/hiking-gear/hiking-backpacks"

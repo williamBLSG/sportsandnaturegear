@@ -1,0 +1,74 @@
+# ── Hiking Article Config ──────────────────────────────────────
+# Pipeline: hiking daily article builder
+
+article_id: hiking-backpacks
+category_id: hiking
+display_name: "Hiking Backpacks"
+site_name: "Sports & Nature Gear"
+site_url: "https://www.sportsandnaturegear.com"
+
+# ── Amazon Creators API ─────────────────────────────────────────
+search_index: SportsAndOutdoors
+keywords: "hiking backpacks"
+min_reviews: 10
+min_rating: 2.5
+price_min_usd: 25
+price_max_usd: 250
+product_count_target: 8
+
+top_brands:
+  - Osprey
+  - Deuter
+  - Gregory
+  - REI Co-op
+  - CamelBak
+  - MYSTERY RANCH
+  - The North Face
+  - Teton Sports
+  - Mountaintop
+  - ZOMAKE
+
+# ── Affiliate ────────────────────────────────────────────────────
+assoc_tag: "${AMZ_ASSOC_TAG}"
+geniuslink_group_id: "hiking"
+geniuslink_group_numeric_id: 0  # UPDATE after creating GeniusLink group
+
+# ── SEO & Page ───────────────────────────────────────────────────
+slug: "/hiking/hiking-gear/hiking-backpacks"
+page_title: "Best Hiking Backpacks: Daypacks and Trail Packs for Every Trip"
+meta_title: "Best Hiking Backpacks 2026: Daypack Picks"
+meta_description: "Osprey and Deuter lead our top hiking backpacks, ranked by comfort, capacity, and buyer ratings. Updated weekly."
+primary_keyword: "hiking backpacks"
+secondary_keywords:
+  - best hiking backpacks
+  - hiking daypack
+  - hiking backpack for women
+  - lightweight hiking backpack
+  - hydration hiking backpack
+  - day hike backpack
+target_word_count_min: 2400
+target_word_count_max: 2800
+
+# ── Google Trends ────────────────────────────────────────────────
+trends_keyword: "hiking backpacks"
+
+# ── Editorial ────────────────────────────────────────────────────
+editorial_notes: >
+  Size matters most — explain liter capacity in practical terms (20L = day hike, 30-40L = overnight,
+  50L+ = multi-day). Hydration compatibility is near-universal now but still worth calling out.
+  Hip belt fit is the comfort differentiator beginners miss. Osprey is the credibility brand with
+  the lifetime warranty. CamelBak owns the hydration niche. Teton Sports and Mountaintop are the
+  budget Amazon picks. Frame type (frameless vs. internal frame) matters for load weight.
+
+# ── Airtable ─────────────────────────────────────────────────────
+airtable_base_id: "${AIRTABLE_SOFTBALL_BASE_ID}"
+table_articles: "hiking-articles"
+table_products: "hiking-products"
+table_faq: "hiking-faq"
+
+# ── Internal Links ───────────────────────────────────────────────
+internal_links:
+  - anchor: "hiking boots"
+    slug: "/hiking/hiking-gear/hiking-boots"
+  - anchor: "insulated water bottles"
+    slug: "/hiking/hiking-gear/insulated-water-bottles"

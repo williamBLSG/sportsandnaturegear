@@ -1,0 +1,74 @@
+# ── Hiking Article Config ──────────────────────────────────────
+# Pipeline: hiking daily article builder
+
+article_id: hiking-boots
+category_id: hiking
+display_name: "Hiking Boots"
+site_name: "Sports & Nature Gear"
+site_url: "https://www.sportsandnaturegear.com"
+
+# ── Amazon Creators API ─────────────────────────────────────────
+search_index: SportsAndOutdoors
+keywords: "hiking boots"
+min_reviews: 10
+min_rating: 2.5
+price_min_usd: 40
+price_max_usd: 300
+product_count_target: 8
+
+top_brands:
+  - Merrell
+  - Salomon
+  - Columbia
+  - KEEN
+  - Danner
+  - Vasque
+  - Hi-Tec
+  - Timberland
+  - NORTIV 8
+  - La Sportiva
+
+# ── Affiliate ────────────────────────────────────────────────────
+assoc_tag: "${AMZ_ASSOC_TAG}"
+geniuslink_group_id: "hiking"
+geniuslink_group_numeric_id: 0  # UPDATE after creating GeniusLink group
+
+# ── SEO & Page ───────────────────────────────────────────────────
+slug: "/hiking/hiking-gear/hiking-boots"
+page_title: "Best Hiking Boots: Trail-Ready Picks for Every Budget"
+meta_title: "Best Hiking Boots 2026: Top Trail Picks"
+meta_description: "Merrell and Salomon lead our top hiking boots, ranked by buyer ratings and trail performance. Updated weekly. Find your fit."
+primary_keyword: "hiking boots"
+secondary_keywords:
+  - best hiking boots
+  - hiking boots for women
+  - hiking boots for beginners
+  - lightweight hiking boots
+  - ankle support hiking boots
+  - day hike boots
+target_word_count_min: 2400
+target_word_count_max: 2800
+
+# ── Google Trends ────────────────────────────────────────────────
+trends_keyword: "hiking boots"
+
+# ── Editorial ────────────────────────────────────────────────────
+editorial_notes: >
+  Ankle support vs. low-cut is the key decision for beginners — explain simply. Waterproofing
+  (Gore-Tex vs. treated leather vs. none) matters for trail conditions. Break-in period is a real
+  pain point Amy cares about. Merrell Moab is the perennial bestseller — position as the safe bet.
+  KEEN has the wide toe box reputation. Salomon is the performance upgrade. NORTIV 8 is the
+  budget Amazon brand that actually reviews well.
+
+# ── Airtable ─────────────────────────────────────────────────────
+airtable_base_id: "${AIRTABLE_SOFTBALL_BASE_ID}"
+table_articles: "hiking-articles"
+table_products: "hiking-products"
+table_faq: "hiking-faq"
+
+# ── Internal Links ───────────────────────────────────────────────
+internal_links:
+  - anchor: "hiking backpacks"
+    slug: "/hiking/hiking-gear/hiking-backpacks"
+  - anchor: "hiking poles"
+    slug: "/hiking/hiking-gear/hiking-poles"

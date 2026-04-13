@@ -1,0 +1,75 @@
+# ── Hiking Article Config ──────────────────────────────────────
+# Pipeline: hiking daily article builder
+
+article_id: waterproof-hiking-boots
+category_id: hiking
+display_name: "Waterproof Hiking Boots"
+site_name: "Sports & Nature Gear"
+site_url: "https://www.sportsandnaturegear.com"
+
+# ── Amazon Creators API ─────────────────────────────────────────
+search_index: SportsAndOutdoors
+keywords: "waterproof hiking boots women"
+min_reviews: 10
+min_rating: 2.5
+price_min_usd: 40
+price_max_usd: 300
+product_count_target: 8
+
+top_brands:
+  - Merrell
+  - Salomon
+  - Columbia
+  - KEEN
+  - Danner
+  - Vasque
+  - Hi-Tec
+  - NORTIV 8
+  - Timberland
+  - La Sportiva
+
+# ── Affiliate ────────────────────────────────────────────────────
+assoc_tag: "${AMZ_ASSOC_TAG}"
+geniuslink_group_id: "hiking"
+geniuslink_group_numeric_id: 0  # UPDATE after creating GeniusLink group
+
+# ── SEO & Page ───────────────────────────────────────────────────
+slug: "/hiking/hiking-gear/waterproof-hiking-boots"
+page_title: "Best Waterproof Hiking Boots: Dry-Feet Picks for Wet Trails"
+meta_title: "Best Waterproof Hiking Boots 2026: Top Picks"
+meta_description: "Merrell and KEEN lead our top waterproof hiking boots, ranked by waterproofing, comfort, and buyer ratings. Updated weekly."
+primary_keyword: "waterproof hiking boots"
+secondary_keywords:
+  - best waterproof hiking boots
+  - waterproof hiking boots for women
+  - gore-tex hiking boots
+  - waterproof trail boots
+  - women's waterproof boots for hiking
+  - rain hiking boots
+target_word_count_min: 2400
+target_word_count_max: 2800
+
+# ── Google Trends ────────────────────────────────────────────────
+trends_keyword: "waterproof hiking boots"
+
+# ── Editorial ────────────────────────────────────────────────────
+editorial_notes: >
+  Waterproofing technology is the lead topic — explain Gore-Tex vs. brand-proprietary membranes
+  (Merrell M Select DRY, Columbia Omni-Tech, KEEN.DRY) in simple terms: they all keep water out
+  and let sweat escape, but Gore-Tex is the gold standard. Breathability trade-off is real — fully
+  waterproof boots run hotter in summer. Seam-sealed construction matters. Differentiate from regular
+  hiking boots by leading with the wet-trail use case: spring mud, stream crossings, Pacific Northwest
+  rain. NORTIV 8 is the budget waterproof option with strong reviews.
+
+# ── Airtable ─────────────────────────────────────────────────────
+airtable_base_id: "${AIRTABLE_SOFTBALL_BASE_ID}"
+table_articles: "hiking-articles"
+table_products: "hiking-products"
+table_faq: "hiking-faq"
+
+# ── Internal Links ───────────────────────────────────────────────
+internal_links:
+  - anchor: "hiking boots"
+    slug: "/hiking/hiking-gear/hiking-boots"
+  - anchor: "hiking sandals"
+    slug: "/hiking/hiking-gear/hiking-sandals"

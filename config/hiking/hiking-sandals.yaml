@@ -1,0 +1,72 @@
+# ── Hiking Article Config ──────────────────────────────────────
+# Pipeline: hiking daily article builder
+
+article_id: hiking-sandals
+category_id: hiking
+display_name: "Hiking Sandals"
+site_name: "Sports & Nature Gear"
+site_url: "https://www.sportsandnaturegear.com"
+
+# ── Amazon Creators API ─────────────────────────────────────────
+search_index: SportsAndOutdoors
+keywords: "hiking sandals women"
+min_reviews: 10
+min_rating: 2.5
+price_min_usd: 20
+price_max_usd: 180
+product_count_target: 8
+
+top_brands:
+  - Chaco
+  - KEEN
+  - Teva
+  - Merrell
+  - Bedrock Sandals
+  - ECCO
+  - Xero Shoes
+  - Skechers
+
+# ── Affiliate ────────────────────────────────────────────────────
+assoc_tag: "${AMZ_ASSOC_TAG}"
+geniuslink_group_id: "hiking"
+geniuslink_group_numeric_id: 0  # UPDATE after creating GeniusLink group
+
+# ── SEO & Page ───────────────────────────────────────────────────
+slug: "/hiking/hiking-gear/hiking-sandals"
+page_title: "Best Hiking Sandals: Supportive, Trail-Ready Picks"
+meta_title: "Best Hiking Sandals 2026: Trail-Ready Picks"
+meta_description: "Chaco and KEEN lead our top hiking sandals, ranked by support, grip, and buyer ratings. Updated weekly."
+primary_keyword: "hiking sandals"
+secondary_keywords:
+  - best hiking sandals
+  - hiking sandals for women
+  - sport sandals for hiking
+  - closed toe hiking sandals
+  - waterproof hiking sandals
+  - arch support hiking sandals
+target_word_count_min: 2200
+target_word_count_max: 2600
+
+# ── Google Trends ────────────────────────────────────────────────
+trends_keyword: "hiking sandals"
+
+# ── Editorial ────────────────────────────────────────────────────
+editorial_notes: >
+  Open-toe vs. closed-toe is the first decision — closed-toe (KEEN Newport) protects against rocks
+  and roots, open-toe (Chaco Z/1) breathes better. Arch support is a real differentiator — Chaco's
+  LUVSEAT footbed is a standout. Strap system and adjustability matter for fit. Tread/outsole grip
+  on wet rock is a safety point. Chaco and KEEN are the credibility brands. Teva is the lifestyle
+  crossover. These are great for summer day hikes, river crossings, and camp shoes after a long day.
+
+# ── Airtable ─────────────────────────────────────────────────────
+airtable_base_id: "${AIRTABLE_SOFTBALL_BASE_ID}"
+table_articles: "hiking-articles"
+table_products: "hiking-products"
+table_faq: "hiking-faq"
+
+# ── Internal Links ───────────────────────────────────────────────
+internal_links:
+  - anchor: "hiking boots"
+    slug: "/hiking/hiking-gear/hiking-boots"
+  - anchor: "waterproof hiking boots"
+    slug: "/hiking/hiking-gear/waterproof-hiking-boots"

@@ -1,8 +1,9 @@
 name: State Activity Pipeline
 
 on:
-  schedule:
-    - cron: "0 13 * * *"  # Daily 5am PT (13:00 UTC)
+  # schedule:
+  #   - cron: "0 13 * * *"  # Daily 5am PT (13:00 UTC)
+  # Disabled 2026-04-12 — all 50 states completed. Manual dispatch retained for reruns.
   workflow_dispatch:
     inputs:
       state:
