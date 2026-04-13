@@ -29,7 +29,7 @@ top_brands:
 # ── Affiliate ────────────────────────────────────────────────────
 assoc_tag: "${AMZ_ASSOC_TAG}"
 geniuslink_group_id: "hiking"
-geniuslink_group_numeric_id: 0  # UPDATE after creating GeniusLink group
+geniuslink_group_numeric_id: 424448
 
 # ── SEO & Page ───────────────────────────────────────────────────
 slug: "/hiking/hiking-gear/hiking-sandals"
