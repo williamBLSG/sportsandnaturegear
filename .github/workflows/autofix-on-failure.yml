@@ -1,0 +1,58 @@
+# Auto-fix agent — triggers on any SANG pipeline workflow failure.
+# Fetches failed logs, asks Claude to classify + propose a minimal patch,
+# opens a PR if the fix is safe. See autofix/run.py for policy.
+
+name: Autofix on failure
+
+on:
+  workflow_run:
+    workflows:
+      - "Hiking Daily Build"
+      - "Hiking Manual Refresh"
+      - "Hiking Price Check"
+      - "Biking Daily Build"
+      - "Biking Manual Refresh"
+      - "Biking Price Check"
+      - "Softball Daily Build"
+      - "Softball Manual Refresh"
+      - "Softball Price Check"
+      - "Weekly Trending Pipeline"
+      - "State Activity Pipeline"
+    types: [completed]
+
+permissions:
+  contents: write
+  pull-requests: write
+  actions: read
+
+jobs:
+  autofix:
+    if: github.event.workflow_run.conclusion == 'failure'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repo at the failing commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          fetch-depth: 30
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Install anthropic SDK
+        run: pip install anthropic
+
+      - name: Run autofix
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RUN_ID: ${{ github.event.workflow_run.id }}
+          WORKFLOW_NAME: ${{ github.event.workflow_run.name }}
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+          RUN_URL: ${{ github.event.workflow_run.html_url }}
+        run: python autofix/run.py
