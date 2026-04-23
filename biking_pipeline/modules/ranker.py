@@ -102,7 +102,7 @@ Return ONLY the JSON array, no other text."""
     try:
         response = client.messages.create(
             model=MODEL_ID,
-            max_tokens=2048,
+            max_tokens=16384,
             messages=[{"role": "user", "content": prompt}],
         )
         response_text = response.content[0].text.strip()
